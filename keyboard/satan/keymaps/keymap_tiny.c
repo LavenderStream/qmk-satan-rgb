@@ -110,14 +110,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 	 * `-----------------------------------------------------------'
 	 */
 	[_MV] = KEYMAP(
-		KC_NO,										 KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,	KC_NO,
-		KC_NO,										 KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,	KC_NO,
-		KC_UP,										 KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,	KC_NO,
-		KC_NO,										 KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,	KC_NO,
-		KC_NO,										 KC_NO, KC_LEFT, KC_NO, KC_NO, KC_NO, KC_NO,	KC_NO,
-		KC_NO,										 KC_NO, F( 1 ), F( 2 ), F( 3 ), F( 4 ), F( 5 ),	F( 6 ),	 F( 7 ),
-		F( 8 ),										 F( 9 ), KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,	KC_NO,
-		KC_TRNS,									 KC_NO, KC_NO, KC_NO ),
+		KC_NO,										 KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,	KC_NO,	 KC_NO,	 KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
+		KC_NO,										 KC_NO, KC_UP, KC_NO, KC_NO, KC_NO, KC_NO,	KC_NO,	 KC_NO,	 KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
+		KC_NO,										 KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,	KC_NO,	 KC_NO,	 KC_NO, KC_NO, KC_NO, KC_NO,
+		KC_NO,										 F( 1 ), F( 2 ), F( 3 ), F( 4 ), F( 5 ), F( 6 ),	F( 7 ),	 F( 8 ), F( 9 ), KC_NO, KC_NO,
+		KC_NO,										 KC_NO, KC_NO, KC_NO, KC_TRNS, KC_NO, KC_NO,	KC_NO ),
 };
 
 enum function_id {
@@ -237,8 +234,6 @@ const macro_t *action_get_macro( keyrecord_t *record, uint8_t id, uint8_t opt )
 	switch ( id )
 	{
 	case _EMAIL:
-
-
 		/*
 		 * return(record->event.pressed ? MACRO( D( LSFT ), T( 1 )T, U( LSFT ), T(
 		 * 3 ), T( 6 ), T( 6 ), T( O ), END ) : MACRO( END ) );
@@ -251,7 +246,7 @@ const macro_t *action_get_macro( keyrecord_t *record, uint8_t id, uint8_t opt )
 		break;
 	case _PASSWORD_MAYUN:
 		return(record->event.pressed
-		 ? MACRO( T( 1 ), END )
+		 ? MACRO( T( T ), END )
 		 : MACRO( END ) );
 		break;
 	}
