@@ -1,0 +1,152 @@
+   1               		.file	"satan.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   7               		.text
+   8               	.Ltext0:
+   9               		.cfi_sections	.debug_frame
+  10               		.section	.text.matrix_init_user,"ax",@progbits
+  11               		.weak	matrix_init_user
+  13               	matrix_init_user:
+  14               	.LFB103:
+  15               		.file 1 "satan.c"
+   1:satan.c       **** #include "satan.h"
+   2:satan.c       **** 
+   3:satan.c       **** __attribute__ ((weak))
+   4:satan.c       **** void * matrix_init_user(void) {
+  16               		.loc 1 4 0
+  17               		.cfi_startproc
+  18               	/* prologue: function */
+  19               	/* frame size = 0 */
+  20               	/* stack size = 0 */
+  21               	.L__stack_usage = 0
+   5:satan.c       **** 	// leave these blank
+   6:satan.c       **** };
+  22               		.loc 1 6 0
+  23 0000 0895      		ret
+  24               		.cfi_endproc
+  25               	.LFE103:
+  27               		.section	.text.matrix_scan_user,"ax",@progbits
+  28               		.weak	matrix_scan_user
+  30               	matrix_scan_user:
+  31               	.LFB104:
+   7:satan.c       **** 
+   8:satan.c       **** __attribute__ ((weak))
+   9:satan.c       **** void * matrix_scan_user(void) {
+  32               		.loc 1 9 0
+  33               		.cfi_startproc
+  34               	/* prologue: function */
+  35               	/* frame size = 0 */
+  36               	/* stack size = 0 */
+  37               	.L__stack_usage = 0
+  10:satan.c       **** 	// leave these blank
+  11:satan.c       **** };
+  38               		.loc 1 11 0
+  39 0000 0895      		ret
+  40               		.cfi_endproc
+  41               	.LFE104:
+  43               		.section	.text.matrix_init_kb,"ax",@progbits
+  44               	.global	matrix_init_kb
+  46               	matrix_init_kb:
+  47               	.LFB105:
+  12:satan.c       **** 
+  13:satan.c       **** void * matrix_init_kb(void) {
+  48               		.loc 1 13 0
+  49               		.cfi_startproc
+  50               	/* prologue: function */
+  51               	/* frame size = 0 */
+  52               	/* stack size = 0 */
+  53               	.L__stack_usage = 0
+  14:satan.c       **** 	// put your keyboard start-up code here
+  15:satan.c       **** 	// runs once when the firmware starts up
+  16:satan.c       **** 	#ifdef BACKLIGHT_ENABLE
+  17:satan.c       ****     	pwm_led_init();
+  54               		.loc 1 17 0
+  55 0000 0E94 0000 		call pwm_led_init
+  56               	.LVL0:
+  18:satan.c       **** 	#endif
+  19:satan.c       **** 
+  20:satan.c       **** 	#ifdef RGBLIGHT_ENABLE
+  21:satan.c       **** 	    rgblight_init();
+  57               		.loc 1 21 0
+  58 0004 0E94 0000 		call rgblight_init
+  59               	.LVL1:
+  22:satan.c       **** 	#endif
+  23:satan.c       **** 
+  24:satan.c       **** 
+  25:satan.c       **** 
+  26:satan.c       **** 	if (matrix_init_user) {
+  60               		.loc 1 26 0
+  61 0008 80E0      		ldi r24,lo8(gs(matrix_init_user))
+  62 000a 90E0      		ldi r25,hi8(gs(matrix_init_user))
+  63 000c 892B      		or r24,r25
+  64 000e 01F0      		breq .L5
+  27:satan.c       **** 		(*matrix_init_user)();
+  65               		.loc 1 27 0
+  66 0010 0C94 0000 		jmp matrix_init_user
+  67               	.LVL2:
+  68               	.L5:
+  28:satan.c       **** 	}
+  29:satan.c       **** };
+  69               		.loc 1 29 0
+  70 0014 0895      		ret
+  71               		.cfi_endproc
+  72               	.LFE105:
+  74               		.section	.text.matrix_scan_kb,"ax",@progbits
+  75               	.global	matrix_scan_kb
+  77               	matrix_scan_kb:
+  78               	.LFB106:
+  30:satan.c       **** 
+  31:satan.c       **** void * matrix_scan_kb(void) {
+  79               		.loc 1 31 0
+  80               		.cfi_startproc
+  81               	/* prologue: function */
+  82               	/* frame size = 0 */
+  83               	/* stack size = 0 */
+  84               	.L__stack_usage = 0
+  32:satan.c       **** 	// put your looping keyboard code here
+  33:satan.c       **** 	// runs every cycle (a lot)
+  34:satan.c       **** 
+  35:satan.c       **** 	if (matrix_scan_user) {
+  85               		.loc 1 35 0
+  86 0000 80E0      		ldi r24,lo8(gs(matrix_scan_user))
+  87 0002 90E0      		ldi r25,hi8(gs(matrix_scan_user))
+  88 0004 892B      		or r24,r25
+  89 0006 01F0      		breq .L8
+  36:satan.c       **** 		(*matrix_scan_user)();
+  90               		.loc 1 36 0
+  91 0008 0C94 0000 		jmp matrix_scan_user
+  92               	.LVL3:
+  93               	.L8:
+  37:satan.c       **** 	}
+  38:satan.c       **** };
+  94               		.loc 1 38 0
+  95 000c 0895      		ret
+  96               		.cfi_endproc
+  97               	.LFE106:
+  99               		.comm	keymap_config,2,1
+ 100               		.text
+ 101               	.Letext0:
+ 102               		.file 2 "d:\\applications\\keyboard\\avr-gcc-4.7.2-mingw32\\bin\\../lib/gcc/avr/4.7.2/../../../../
+ 103               		.file 3 "../../quantum/keymap_common.h"
+ 104               		.file 4 "../../tmk_core/protocol/lufa/LUFA-git/LUFA/Drivers/USB/Core/USBTask.h"
+ 105               		.file 5 "rgblight.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 satan.c
+C:\Users\tiny\AppData\Local\Temp\cc8RZWUf.s:2      *ABS*:0000003e __SP_H__
+C:\Users\tiny\AppData\Local\Temp\cc8RZWUf.s:3      *ABS*:0000003d __SP_L__
+C:\Users\tiny\AppData\Local\Temp\cc8RZWUf.s:4      *ABS*:0000003f __SREG__
+C:\Users\tiny\AppData\Local\Temp\cc8RZWUf.s:5      *ABS*:00000000 __tmp_reg__
+C:\Users\tiny\AppData\Local\Temp\cc8RZWUf.s:6      *ABS*:00000001 __zero_reg__
+C:\Users\tiny\AppData\Local\Temp\cc8RZWUf.s:13     .text.matrix_init_user:00000000 matrix_init_user
+C:\Users\tiny\AppData\Local\Temp\cc8RZWUf.s:30     .text.matrix_scan_user:00000000 matrix_scan_user
+C:\Users\tiny\AppData\Local\Temp\cc8RZWUf.s:46     .text.matrix_init_kb:00000000 matrix_init_kb
+C:\Users\tiny\AppData\Local\Temp\cc8RZWUf.s:77     .text.matrix_scan_kb:00000000 matrix_scan_kb
+                            *COM*:00000002 keymap_config
+
+UNDEFINED SYMBOLS
+pwm_led_init
+rgblight_init
+__do_clear_bss

@@ -53,6 +53,7 @@ void rgblight_increase(void);
 void rgblight_decrease(void);
 void rgblight_toggle(void);
 void rgblight_step(void);
+void rgblight_pre(void);
 void rgblight_mode(uint8_t mode);
 void rgblight_set(void);
 void rgblight_increase_hue(void);

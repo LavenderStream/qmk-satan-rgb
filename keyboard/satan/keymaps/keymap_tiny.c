@@ -26,7 +26,6 @@
  * MACRO
  */
 #define _EMAIL		0
-#define _PASSWORD_MAYUN 1
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 	/* Keymap _BW: (Base Windows) Windows Default Layer
@@ -92,7 +91,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 			KC_GRV,									 KC_F1, KC_F2, KC_F3, KC_F4, KC_F5, KC_F6,	KC_F7,	 KC_F8,	 KC_F9, KC_F10, KC_F11, KC_F12, KC_DEL,
 			KC_TRNS,								 F( 12 ), KC_UP, F( 13 ), KC_TRNS, KC_INS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
 			KC_TRNS,								 KC_LEFT, KC_DOWN, KC_RGHT, KC_TRNS, KC_HOME, KC_LEFT, KC_DOWN, KC_UP,	 KC_RGHT, KC_HOME, KC_TRNS, KC_TRNS,
-			KC_TRNS,								 KC_VOLD, KC_VOLU, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_END, KC_TRNS,
+			KC_TRNS,								 KC_VOLD, KC_VOLU, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_END, KC_UP,
 			KC_MPRV,								 KC_MPLY, KC_MNXT, KC_TRNS, KC_DOWN, KC_LEFT, KC_TRNS, KC_RGHT ),
 
 
@@ -121,6 +120,7 @@ enum function_id {
 	SHIFT_ESC,
 	RGBLED_TOGGLE,
 	RGBLED_STEP_MODE,
+	RGBLED_PRE_MODE,
 	RGBLED_INCREASE_HUE,
 	RGBLED_DECREASE_HUE,
 	RGBLED_INCREASE_SAT,
@@ -134,15 +134,18 @@ const uint16_t PROGMEM fn_actions[] = {
 	/* rgb */
 	[1]	= ACTION_FUNCTION( RGBLED_TOGGLE ),
 	[2]	= ACTION_FUNCTION( RGBLED_STEP_MODE ),
-	[3]	= ACTION_FUNCTION( RGBLED_INCREASE_HUE ),
-	[4]	= ACTION_FUNCTION( RGBLED_DECREASE_HUE ),
-	[5]	= ACTION_FUNCTION( RGBLED_INCREASE_SAT ),
-	[6]	= ACTION_FUNCTION( RGBLED_DECREASE_SAT ),
+	[3]	= ACTION_FUNCTION( RGBLED_PRE_MODE ),
+	[4]	= ACTION_FUNCTION( RGBLED_INCREASE_HUE ),
+	[5]	= ACTION_FUNCTION( RGBLED_DECREASE_HUE ),
+	[6]	= ACTION_FUNCTION( RGBLED_INCREASE_SAT ),
+	[7]	= ACTION_FUNCTION( RGBLED_DECREASE_SAT ),
 	/* backlight */
-	[8] = ACTION_BACKLIGHT_DECREASE(),		 [9] = ACTION_BACKLIGHT_INCREASE(),
+	[8] = ACTION_BACKLIGHT_DECREASE(),
+	[9] = ACTION_BACKLIGHT_INCREASE(),
 	/* layout */
-	[10]	= ACTION_LAYER_MOMENTARY( _MV ),	 [11] = ACTION_LAYER_MOMENTARY( _FL ),
-	[12]	= ACTION_MACRO( _EMAIL ),		 [13] = ACTION_MACRO( _PASSWORD_MAYUN ),
+	[10]	= ACTION_LAYER_MOMENTARY( _MV ),
+	[11] = ACTION_LAYER_MOMENTARY( _FL ),
+	[12]	= ACTION_MACRO( _EMAIL ),
 };
 
 #define MODS_CTRL_MASK (MOD_BIT( KC_LSHIFT ) | MOD_BIT( KC_RSHIFT ) )
@@ -154,7 +157,7 @@ void action_function( keyrecord_t *record, uint8_t id, uint8_t opt )
 	{
 	case SHIFT_ESC:
 		shift_esc_shift_mask = get_mods() & MODS_CTRL_MASK;
-		if ( record->event.pressed )
+		if ( record->event.pressed)
 		{
 			if ( shift_esc_shift_mask )
 			{
@@ -225,6 +228,11 @@ void action_function( keyrecord_t *record, uint8_t id, uint8_t opt )
 			rgblight_step();
 		}
 		break;
+	case RGBLED_PRE_MODE:
+	if ( record->event.pressed ){
+		rgblight_pre();
+	}
+		break;
 	}
 }
 
@@ -242,11 +250,6 @@ const macro_t *action_get_macro( keyrecord_t *record, uint8_t id, uint8_t opt )
 		 ? MACRO( T( 1 ), T( 3 ), T( 6 ), T( 6 ), T( 2 ), T( 5 ), T( 2 ), T( 1 ), T( 4 ),
 				D( LSFT ), T( 2 ), U( LSFT ), T( Q ), T( Q ), T( DOT ), T( C ),
 				T( O ), T( M ), END )
-		 : MACRO( END ) );
-		break;
-	case _PASSWORD_MAYUN:
-		return(record->event.pressed
-		 ? MACRO( T( T ), END )
 		 : MACRO( END ) );
 		break;
 	}

@@ -1,0 +1,815 @@
+   1               		.file	"backlight.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   7               		.text
+   8               	.Ltext0:
+   9               		.cfi_sections	.debug_frame
+  10               		.section	.text.pwm_led_init,"ax",@progbits
+  11               	.global	pwm_led_init
+  13               	pwm_led_init:
+  14               	.LFB7:
+  15               		.file 1 "backlight.c"
+   1:backlight.c   **** /*
+   2:backlight.c   **** Copyright 2013 Mathias Andersson <wraul@dbox.se>
+   3:backlight.c   **** 
+   4:backlight.c   **** This program is free software: you can redistribute it and/or modify
+   5:backlight.c   **** it under the terms of the GNU General Public License as published by
+   6:backlight.c   **** the Free Software Foundation, either version 2 of the License, or
+   7:backlight.c   **** (at your option) any later version.
+   8:backlight.c   **** 
+   9:backlight.c   **** This program is distributed in the hope that it will be useful,
+  10:backlight.c   **** but WITHOUT ANY WARRANTY; without even the implied warranty of
+  11:backlight.c   **** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  12:backlight.c   **** GNU General Public License for more details.
+  13:backlight.c   **** 
+  14:backlight.c   **** You should have received a copy of the GNU General Public License
+  15:backlight.c   **** along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  16:backlight.c   **** */
+  17:backlight.c   **** /* Breathing Sleep LED brighness(PWM On period) table
+  18:backlight.c   ****  * (64[steps] * 4[duration]) / 64[PWM periods/s] = 4 second breath cycle
+  19:backlight.c   ****  *
+  20:backlight.c   ****  * http://www.wolframalpha.com/input/?i=%28sin%28+x%2F64*pi%29**8+*+255%2C+x%3D0+to+63
+  21:backlight.c   ****  * (0..63).each {|x| p ((sin(x/64.0*PI)**8)*255).to_i }
+  22:backlight.c   **** */
+  23:backlight.c   **** #include <avr/io.h>
+  24:backlight.c   **** #include <util/delay.h>
+  25:backlight.c   **** #include <avr/interrupt.h>
+  26:backlight.c   **** #include <stdint.h>
+  27:backlight.c   **** #include <avr/pgmspace.h>
+  28:backlight.c   **** 
+  29:backlight.c   **** #include "backlight.h"
+  30:backlight.c   **** 
+  31:backlight.c   **** #ifdef RGBLIGHT_ENABLE
+  32:backlight.c   **** #include "rgblight.h"
+  33:backlight.c   **** #endif
+  34:backlight.c   **** 
+  35:backlight.c   **** 
+  36:backlight.c   **** 
+  37:backlight.c   **** #define DEFAULT_ACCURACY  256
+  38:backlight.c   **** #define PWM_LED_TIMER_TOP F_CPU/(256*64)
+  39:backlight.c   **** 
+  40:backlight.c   **** static const uint8_t breathing_table[][256] PROGMEM = {{0,0,0,0,1,1,1,2,2,3,4,5,5,6,7,9,10,11,12,14
+  41:backlight.c   **** }};
+  42:backlight.c   **** 
+  43:backlight.c   **** 
+  44:backlight.c   **** 
+  45:backlight.c   **** uint8_t acc = 0;
+  46:backlight.c   **** bool is_init = false;
+  47:backlight.c   **** uint8_t accuracy = 0xff;
+  48:backlight.c   **** uint8_t speed = 1;
+  49:backlight.c   **** uint8_t current_level = 0;
+  50:backlight.c   **** uint8_t duty_cycle = 0;
+  51:backlight.c   **** uint8_t pos = 0;
+  52:backlight.c   **** 
+  53:backlight.c   **** 
+  54:backlight.c   **** void pwm_led_init(void)
+  55:backlight.c   **** {
+  16               		.loc 1 55 0
+  17               		.cfi_startproc
+  18               	/* prologue: function */
+  19               	/* frame size = 0 */
+  20               	/* stack size = 0 */
+  21               	.L__stack_usage = 0
+  56:backlight.c   ****     if(is_init){
+  22               		.loc 1 56 0
+  23 0000 8091 0000 		lds r24,is_init
+  24 0004 8111      		cpse r24,__zero_reg__
+  25 0006 00C0      		rjmp .L1
+  57:backlight.c   ****         return;
+  58:backlight.c   ****     }
+  59:backlight.c   ****     is_init = true;
+  26               		.loc 1 59 0
+  27 0008 81E0      		ldi r24,lo8(1)
+  28 000a 8093 0000 		sts is_init,r24
+  60:backlight.c   ****     /* Timer1 setup */
+  61:backlight.c   ****     /* CTC mode */
+  62:backlight.c   ****     TCCR1B |= _BV(WGM12);
+  29               		.loc 1 62 0
+  30 000e 8091 8100 		lds r24,129
+  31 0012 8860      		ori r24,lo8(8)
+  32 0014 8093 8100 		sts 129,r24
+  63:backlight.c   ****     /* Clock selelct: clk/1 */
+  64:backlight.c   ****     TCCR1B |= _BV(CS10);
+  33               		.loc 1 64 0
+  34 0018 8091 8100 		lds r24,129
+  35 001c 8160      		ori r24,lo8(1)
+  36 001e 8093 8100 		sts 129,r24
+  65:backlight.c   ****     /* Set TOP value */
+  66:backlight.c   ****     uint8_t sreg = SREG;
+  37               		.loc 1 66 0
+  38 0022 8FB7      		in r24,__SREG__
+  39               	.LVL0:
+  67:backlight.c   ****     cli();
+  40               		.loc 1 67 0
+  41               	/* #APP */
+  42               	 ;  67 "backlight.c" 1
+  43 0024 F894      		cli
+  44               	 ;  0 "" 2
+  68:backlight.c   ****     OCR1AH = (PWM_LED_TIMER_TOP>>8)&0xff;
+  45               		.loc 1 68 0
+  46               	/* #NOAPP */
+  47 0026 93E0      		ldi r25,lo8(3)
+  48 0028 9093 8900 		sts 137,r25
+  69:backlight.c   ****     OCR1AL = PWM_LED_TIMER_TOP&0xff;
+  49               		.loc 1 69 0
+  50 002c 90ED      		ldi r25,lo8(-48)
+  51 002e 9093 8800 		sts 136,r25
+  70:backlight.c   ****     SREG = sreg;
+  52               		.loc 1 70 0
+  53 0032 8FBF      		out __SREG__,r24
+  54               	.LVL1:
+  55               	.L1:
+  56 0034 0895      		ret
+  57               		.cfi_endproc
+  58               	.LFE7:
+  60               		.section	.text.open_led,"ax",@progbits
+  61               	.global	open_led
+  63               	open_led:
+  64               	.LFB8:
+  71:backlight.c   **** }
+  72:backlight.c   **** void open_led(void)
+  73:backlight.c   **** {
+  65               		.loc 1 73 0
+  66               		.cfi_startproc
+  67               	/* prologue: function */
+  68               	/* frame size = 0 */
+  69               	/* stack size = 0 */
+  70               	.L__stack_usage = 0
+  74:backlight.c   ****     PORTB |= (1<<6);
+  71               		.loc 1 74 0
+  72 0000 2E9A      		sbi 0x5,6
+  73 0002 0895      		ret
+  74               		.cfi_endproc
+  75               	.LFE8:
+  77               		.section	.text.close_led,"ax",@progbits
+  78               	.global	close_led
+  80               	close_led:
+  81               	.LFB9:
+  75:backlight.c   **** }
+  76:backlight.c   **** void close_led(void)
+  77:backlight.c   **** {
+  82               		.loc 1 77 0
+  83               		.cfi_startproc
+  84               	/* prologue: function */
+  85               	/* frame size = 0 */
+  86               	/* stack size = 0 */
+  87               	.L__stack_usage = 0
+  78:backlight.c   ****     PORTB &= ~(1<<6);
+  88               		.loc 1 78 0
+  89 0000 2E98      		cbi 0x5,6
+  90 0002 0895      		ret
+  91               		.cfi_endproc
+  92               	.LFE9:
+  94               		.section	.text.pwm_led_enable,"ax",@progbits
+  95               	.global	pwm_led_enable
+  97               	pwm_led_enable:
+  98               	.LFB10:
+  79:backlight.c   **** }
+  80:backlight.c   **** void pwm_led_enable(void)
+  81:backlight.c   **** {
+  99               		.loc 1 81 0
+ 100               		.cfi_startproc
+ 101               	/* prologue: function */
+ 102               	/* frame size = 0 */
+ 103               	/* stack size = 0 */
+ 104               	.L__stack_usage = 0
+  82:backlight.c   ****     /* Enable Compare Match Interrupt */
+  83:backlight.c   ****     TIMSK1 |= _BV(OCIE1A);
+ 105               		.loc 1 83 0
+ 106 0000 EFE6      		ldi r30,lo8(111)
+ 107 0002 F0E0      		ldi r31,0
+ 108 0004 8081      		ld r24,Z
+ 109 0006 8260      		ori r24,lo8(2)
+ 110 0008 8083      		st Z,r24
+ 111 000a 0895      		ret
+ 112               		.cfi_endproc
+ 113               	.LFE10:
+ 115               		.section	.text.pwm_led_disable,"ax",@progbits
+ 116               	.global	pwm_led_disable
+ 118               	pwm_led_disable:
+ 119               	.LFB11:
+  84:backlight.c   **** }
+  85:backlight.c   **** 
+  86:backlight.c   **** void pwm_led_disable(void)
+  87:backlight.c   **** {
+ 120               		.loc 1 87 0
+ 121               		.cfi_startproc
+ 122               	/* prologue: function */
+ 123               	/* frame size = 0 */
+ 124               	/* stack size = 0 */
+ 125               	.L__stack_usage = 0
+  88:backlight.c   ****     /* Disable Compare Match Interrupt */
+  89:backlight.c   ****     TIMSK1 &= ~_BV(OCIE1A);
+ 126               		.loc 1 89 0
+ 127 0000 EFE6      		ldi r30,lo8(111)
+ 128 0002 F0E0      		ldi r31,0
+ 129 0004 8081      		ld r24,Z
+ 130 0006 8D7F      		andi r24,lo8(-3)
+ 131 0008 8083      		st Z,r24
+ 132 000a 0895      		ret
+ 133               		.cfi_endproc
+ 134               	.LFE11:
+ 136               		.section	.text.backlight_set,"ax",@progbits
+ 137               	.global	backlight_set
+ 139               	backlight_set:
+ 140               	.LFB12:
+  90:backlight.c   **** }
+  91:backlight.c   **** void backlight_set(uint8_t level)
+  92:backlight.c   **** {
+ 141               		.loc 1 92 0
+ 142               		.cfi_startproc
+ 143               	.LVL2:
+ 144               	/* prologue: function */
+ 145               	/* frame size = 0 */
+ 146               	/* stack size = 0 */
+ 147               	.L__stack_usage = 0
+  93:backlight.c   ****     //uart_transmit(level);
+  94:backlight.c   ****     current_level = level;
+ 148               		.loc 1 94 0
+ 149 0000 8093 0000 		sts current_level,r24
+  95:backlight.c   ****     DDRB |= (1<<6);
+ 150               		.loc 1 95 0
+ 151 0004 269A      		sbi 0x4,6
+  96:backlight.c   ****     //PORTB |= (1<<6);
+  97:backlight.c   ****     //pwm_led_init();
+  98:backlight.c   ****    // pwm_led_enable();
+  99:backlight.c   **** 
+ 100:backlight.c   ****     if(level > 0)
+ 152               		.loc 1 100 0
+ 153 0006 8111      		cpse r24,__zero_reg__
+ 101:backlight.c   ****     {
+ 102:backlight.c   ****         pwm_led_enable();
+ 154               		.loc 1 102 0
+ 155 0008 0C94 0000 		jmp pwm_led_enable
+ 156               	.LVL3:
+ 157               	.L8:
+ 103:backlight.c   ****     }
+ 104:backlight.c   ****     else
+ 105:backlight.c   ****     {
+ 106:backlight.c   **** 
+ 107:backlight.c   ****         pwm_led_disable();
+ 158               		.loc 1 107 0
+ 159 000c 0E94 0000 		call pwm_led_disable
+ 160               	.LVL4:
+ 108:backlight.c   ****         close_led();
+ 161               		.loc 1 108 0
+ 162 0010 0C94 0000 		jmp close_led
+ 163               	.LVL5:
+ 164               		.cfi_endproc
+ 165               	.LFE12:
+ 167               		.section	.text.tick,"ax",@progbits
+ 168               	.global	tick
+ 170               	tick:
+ 171               	.LFB13:
+ 109:backlight.c   ****     }
+ 110:backlight.c   **** 
+ 111:backlight.c   **** }
+ 112:backlight.c   **** 
+ 113:backlight.c   **** 
+ 114:backlight.c   **** void tick(void)
+ 115:backlight.c   **** {
+ 172               		.loc 1 115 0
+ 173               		.cfi_startproc
+ 174               	/* prologue: function */
+ 175               	/* frame size = 0 */
+ 176               	/* stack size = 0 */
+ 177               	.L__stack_usage = 0
+ 116:backlight.c   ****     if(current_level == 1)
+ 178               		.loc 1 116 0
+ 179 0000 8091 0000 		lds r24,current_level
+ 180 0004 8130      		cpi r24,lo8(1)
+ 181 0006 01F4      		brne .L10
+ 117:backlight.c   ****     {
+ 118:backlight.c   ****         duty_cycle = 85;
+ 182               		.loc 1 118 0
+ 183 0008 85E5      		ldi r24,lo8(85)
+ 184 000a 00C0      		rjmp .L17
+ 185               	.L10:
+ 119:backlight.c   ****     }
+ 120:backlight.c   ****     else if(current_level == 2)
+ 186               		.loc 1 120 0
+ 187 000c 8230      		cpi r24,lo8(2)
+ 188 000e 01F4      		brne .L12
+ 121:backlight.c   ****     {
+ 122:backlight.c   ****         duty_cycle = 130;
+ 189               		.loc 1 122 0
+ 190 0010 82E8      		ldi r24,lo8(-126)
+ 191               	.L17:
+ 192 0012 8093 0000 		sts duty_cycle,r24
+ 193 0016 0895      		ret
+ 194               	.L12:
+ 123:backlight.c   ****     }
+ 124:backlight.c   ****     else if(current_level == 3)
+ 195               		.loc 1 124 0
+ 196 0018 8330      		cpi r24,lo8(3)
+ 197 001a 01F4      		brne .L13
+ 125:backlight.c   ****     {
+ 126:backlight.c   ****         duty_cycle = 190;
+ 198               		.loc 1 126 0
+ 199 001c 8EEB      		ldi r24,lo8(-66)
+ 200 001e 00C0      		rjmp .L17
+ 201               	.L13:
+ 127:backlight.c   ****     }
+ 128:backlight.c   ****     else if(current_level == 4)
+ 202               		.loc 1 128 0
+ 203 0020 8430      		cpi r24,lo8(4)
+ 204 0022 01F4      		brne .L14
+ 129:backlight.c   ****     {
+ 130:backlight.c   ****         duty_cycle = 255;
+ 205               		.loc 1 130 0
+ 206 0024 8FEF      		ldi r24,lo8(-1)
+ 207 0026 00C0      		rjmp .L17
+ 208               	.L14:
+ 131:backlight.c   ****     }
+ 132:backlight.c   ****     else if(current_level == 5)
+ 209               		.loc 1 132 0
+ 210 0028 8530      		cpi r24,lo8(5)
+ 211 002a 01F4      		brne .L9
+ 133:backlight.c   ****     {
+ 134:backlight.c   ****         pos++;
+ 212               		.loc 1 134 0
+ 213 002c 8091 0000 		lds r24,pos
+ 214 0030 8F5F      		subi r24,lo8(-(1))
+ 215 0032 8093 0000 		sts pos,r24
+ 216               	.LVL6:
+ 217               	.LBB2:
+ 135:backlight.c   ****         duty_cycle = pgm_read_byte(&breathing_table[0][pos]);
+ 218               		.loc 1 135 0
+ 219 0036 E82F      		mov r30,r24
+ 220 0038 F0E0      		ldi r31,0
+ 221 003a E050      		subi r30,lo8(-(breathing_table))
+ 222 003c F040      		sbci r31,hi8(-(breathing_table))
+ 223               	/* #APP */
+ 224               	 ;  135 "backlight.c" 1
+ 225 003e E491      		lpm r30, Z
+ 226               		
+ 227               	 ;  0 "" 2
+ 228               	.LVL7:
+ 229               	/* #NOAPP */
+ 230               	.LBE2:
+ 231 0040 E093 0000 		sts duty_cycle,r30
+ 136:backlight.c   ****         if(pos >= 0xff){
+ 232               		.loc 1 136 0
+ 233 0044 8F3F      		cpi r24,lo8(-1)
+ 234 0046 01F4      		brne .L9
+ 137:backlight.c   ****             pos = 0;
+ 235               		.loc 1 137 0
+ 236 0048 1092 0000 		sts pos,__zero_reg__
+ 237               	.LVL8:
+ 238               	.L9:
+ 239 004c 0895      		ret
+ 240               		.cfi_endproc
+ 241               	.LFE13:
+ 243               		.section	.text.__vector_17,"ax",@progbits
+ 244               	.global	__vector_17
+ 246               	__vector_17:
+ 247               	.LFB14:
+ 138:backlight.c   ****         }
+ 139:backlight.c   ****     }
+ 140:backlight.c   **** }
+ 141:backlight.c   **** 
+ 142:backlight.c   **** ISR(TIMER1_COMPA_vect)
+ 143:backlight.c   **** {
+ 248               		.loc 1 143 0
+ 249               		.cfi_startproc
+ 250 0000 1F92      		push r1
+ 251               	.LCFI0:
+ 252               		.cfi_def_cfa_offset 3
+ 253               		.cfi_offset 1, -2
+ 254 0002 0F92      		push r0
+ 255               	.LCFI1:
+ 256               		.cfi_def_cfa_offset 4
+ 257               		.cfi_offset 0, -3
+ 258 0004 0FB6      		in r0,__SREG__
+ 259 0006 0F92      		push r0
+ 260 0008 1124      		clr __zero_reg__
+ 261 000a 2F93      		push r18
+ 262               	.LCFI2:
+ 263               		.cfi_def_cfa_offset 5
+ 264               		.cfi_offset 18, -4
+ 265 000c 3F93      		push r19
+ 266               	.LCFI3:
+ 267               		.cfi_def_cfa_offset 6
+ 268               		.cfi_offset 19, -5
+ 269 000e 4F93      		push r20
+ 270               	.LCFI4:
+ 271               		.cfi_def_cfa_offset 7
+ 272               		.cfi_offset 20, -6
+ 273 0010 5F93      		push r21
+ 274               	.LCFI5:
+ 275               		.cfi_def_cfa_offset 8
+ 276               		.cfi_offset 21, -7
+ 277 0012 6F93      		push r22
+ 278               	.LCFI6:
+ 279               		.cfi_def_cfa_offset 9
+ 280               		.cfi_offset 22, -8
+ 281 0014 7F93      		push r23
+ 282               	.LCFI7:
+ 283               		.cfi_def_cfa_offset 10
+ 284               		.cfi_offset 23, -9
+ 285 0016 8F93      		push r24
+ 286               	.LCFI8:
+ 287               		.cfi_def_cfa_offset 11
+ 288               		.cfi_offset 24, -10
+ 289 0018 9F93      		push r25
+ 290               	.LCFI9:
+ 291               		.cfi_def_cfa_offset 12
+ 292               		.cfi_offset 25, -11
+ 293 001a AF93      		push r26
+ 294               	.LCFI10:
+ 295               		.cfi_def_cfa_offset 13
+ 296               		.cfi_offset 26, -12
+ 297 001c BF93      		push r27
+ 298               	.LCFI11:
+ 299               		.cfi_def_cfa_offset 14
+ 300               		.cfi_offset 27, -13
+ 301 001e EF93      		push r30
+ 302               	.LCFI12:
+ 303               		.cfi_def_cfa_offset 15
+ 304               		.cfi_offset 30, -14
+ 305 0020 FF93      		push r31
+ 306               	.LCFI13:
+ 307               		.cfi_def_cfa_offset 16
+ 308               		.cfi_offset 31, -15
+ 309               	/* prologue: Signal */
+ 310               	/* frame size = 0 */
+ 311               	/* stack size = 15 */
+ 312               	.L__stack_usage = 15
+ 144:backlight.c   ****     acc++;
+ 313               		.loc 1 144 0
+ 314 0022 8091 0000 		lds r24,acc
+ 315 0026 8F5F      		subi r24,lo8(-(1))
+ 316 0028 8093 0000 		sts acc,r24
+ 145:backlight.c   ****     if(acc == accuracy)
+ 317               		.loc 1 145 0
+ 318 002c 9091 0000 		lds r25,accuracy
+ 319 0030 8913      		cpse r24,r25
+ 320 0032 00C0      		rjmp .L19
+ 146:backlight.c   ****     {
+ 147:backlight.c   ****         acc=0;
+ 321               		.loc 1 147 0
+ 322 0034 1092 0000 		sts acc,__zero_reg__
+ 148:backlight.c   ****         open_led();
+ 323               		.loc 1 148 0
+ 324 0038 0E94 0000 		call open_led
+ 325               	.LVL9:
+ 149:backlight.c   ****         tick();
+ 326               		.loc 1 149 0
+ 327 003c 0E94 0000 		call tick
+ 328               	.LVL10:
+ 329               	.L19:
+ 150:backlight.c   ****     }
+ 151:backlight.c   ****     if (acc == duty_cycle)
+ 330               		.loc 1 151 0
+ 331 0040 9091 0000 		lds r25,acc
+ 332 0044 8091 0000 		lds r24,duty_cycle
+ 333 0048 9813      		cpse r25,r24
+ 334 004a 00C0      		rjmp .L18
+ 152:backlight.c   ****     {
+ 153:backlight.c   ****         close_led();
+ 335               		.loc 1 153 0
+ 336 004c 0E94 0000 		call close_led
+ 337               	.LVL11:
+ 338               	.L18:
+ 339               	/* epilogue start */
+ 154:backlight.c   ****     }
+ 155:backlight.c   **** }
+ 340               		.loc 1 155 0
+ 341 0050 FF91      		pop r31
+ 342 0052 EF91      		pop r30
+ 343 0054 BF91      		pop r27
+ 344 0056 AF91      		pop r26
+ 345 0058 9F91      		pop r25
+ 346 005a 8F91      		pop r24
+ 347 005c 7F91      		pop r23
+ 348 005e 6F91      		pop r22
+ 349 0060 5F91      		pop r21
+ 350 0062 4F91      		pop r20
+ 351 0064 3F91      		pop r19
+ 352 0066 2F91      		pop r18
+ 353 0068 0F90      		pop r0
+ 354 006a 0FBE      		out __SREG__,r0
+ 355 006c 0F90      		pop r0
+ 356 006e 1F90      		pop r1
+ 357 0070 1895      		reti
+ 358               		.cfi_endproc
+ 359               	.LFE14:
+ 361               	.global	pos
+ 362               		.section	.bss.pos,"aw",@nobits
+ 365               	pos:
+ 366 0000 00        		.zero	1
+ 367               	.global	duty_cycle
+ 368               		.section	.bss.duty_cycle,"aw",@nobits
+ 371               	duty_cycle:
+ 372 0000 00        		.zero	1
+ 373               	.global	current_level
+ 374               		.section	.bss.current_level,"aw",@nobits
+ 377               	current_level:
+ 378 0000 00        		.zero	1
+ 379               	.global	speed
+ 380               		.section	.data.speed,"aw",@progbits
+ 383               	speed:
+ 384 0000 01        		.byte	1
+ 385               	.global	accuracy
+ 386               		.section	.data.accuracy,"aw",@progbits
+ 389               	accuracy:
+ 390 0000 FF        		.byte	-1
+ 391               	.global	is_init
+ 392               		.section	.bss.is_init,"aw",@nobits
+ 395               	is_init:
+ 396 0000 00        		.zero	1
+ 397               	.global	acc
+ 398               		.section	.bss.acc,"aw",@nobits
+ 401               	acc:
+ 402 0000 00        		.zero	1
+ 403               		.section	.progmem.data.breathing_table,"a",@progbits
+ 406               	breathing_table:
+ 407 0000 00        		.byte	0
+ 408 0001 00        		.byte	0
+ 409 0002 00        		.byte	0
+ 410 0003 00        		.byte	0
+ 411 0004 01        		.byte	1
+ 412 0005 01        		.byte	1
+ 413 0006 01        		.byte	1
+ 414 0007 02        		.byte	2
+ 415 0008 02        		.byte	2
+ 416 0009 03        		.byte	3
+ 417 000a 04        		.byte	4
+ 418 000b 05        		.byte	5
+ 419 000c 05        		.byte	5
+ 420 000d 06        		.byte	6
+ 421 000e 07        		.byte	7
+ 422 000f 09        		.byte	9
+ 423 0010 0A        		.byte	10
+ 424 0011 0B        		.byte	11
+ 425 0012 0C        		.byte	12
+ 426 0013 0E        		.byte	14
+ 427 0014 0F        		.byte	15
+ 428 0015 11        		.byte	17
+ 429 0016 12        		.byte	18
+ 430 0017 14        		.byte	20
+ 431 0018 15        		.byte	21
+ 432 0019 17        		.byte	23
+ 433 001a 19        		.byte	25
+ 434 001b 1B        		.byte	27
+ 435 001c 1D        		.byte	29
+ 436 001d 1F        		.byte	31
+ 437 001e 21        		.byte	33
+ 438 001f 23        		.byte	35
+ 439 0020 25        		.byte	37
+ 440 0021 28        		.byte	40
+ 441 0022 2A        		.byte	42
+ 442 0023 2C        		.byte	44
+ 443 0024 2F        		.byte	47
+ 444 0025 31        		.byte	49
+ 445 0026 34        		.byte	52
+ 446 0027 36        		.byte	54
+ 447 0028 39        		.byte	57
+ 448 0029 3B        		.byte	59
+ 449 002a 3E        		.byte	62
+ 450 002b 41        		.byte	65
+ 451 002c 43        		.byte	67
+ 452 002d 46        		.byte	70
+ 453 002e 49        		.byte	73
+ 454 002f 4C        		.byte	76
+ 455 0030 4F        		.byte	79
+ 456 0031 52        		.byte	82
+ 457 0032 55        		.byte	85
+ 458 0033 58        		.byte	88
+ 459 0034 5A        		.byte	90
+ 460 0035 5D        		.byte	93
+ 461 0036 61        		.byte	97
+ 462 0037 64        		.byte	100
+ 463 0038 67        		.byte	103
+ 464 0039 6A        		.byte	106
+ 465 003a 6D        		.byte	109
+ 466 003b 70        		.byte	112
+ 467 003c 73        		.byte	115
+ 468 003d 76        		.byte	118
+ 469 003e 79        		.byte	121
+ 470 003f 7C        		.byte	124
+ 471 0040 7F        		.byte	127
+ 472 0041 83        		.byte	-125
+ 473 0042 86        		.byte	-122
+ 474 0043 89        		.byte	-119
+ 475 0044 8C        		.byte	-116
+ 476 0045 8F        		.byte	-113
+ 477 0046 92        		.byte	-110
+ 478 0047 95        		.byte	-107
+ 479 0048 98        		.byte	-104
+ 480 0049 9B        		.byte	-101
+ 481 004a 9E        		.byte	-98
+ 482 004b A2        		.byte	-94
+ 483 004c A5        		.byte	-91
+ 484 004d A7        		.byte	-89
+ 485 004e AA        		.byte	-86
+ 486 004f AD        		.byte	-83
+ 487 0050 B0        		.byte	-80
+ 488 0051 B3        		.byte	-77
+ 489 0052 B6        		.byte	-74
+ 490 0053 B9        		.byte	-71
+ 491 0054 BC        		.byte	-68
+ 492 0055 BE        		.byte	-66
+ 493 0056 C1        		.byte	-63
+ 494 0057 C4        		.byte	-60
+ 495 0058 C6        		.byte	-58
+ 496 0059 C9        		.byte	-55
+ 497 005a CB        		.byte	-53
+ 498 005b CE        		.byte	-50
+ 499 005c D0        		.byte	-48
+ 500 005d D3        		.byte	-45
+ 501 005e D5        		.byte	-43
+ 502 005f D7        		.byte	-41
+ 503 0060 DA        		.byte	-38
+ 504 0061 DC        		.byte	-36
+ 505 0062 DE        		.byte	-34
+ 506 0063 E0        		.byte	-32
+ 507 0064 E2        		.byte	-30
+ 508 0065 E4        		.byte	-28
+ 509 0066 E6        		.byte	-26
+ 510 0067 E8        		.byte	-24
+ 511 0068 EA        		.byte	-22
+ 512 0069 EB        		.byte	-21
+ 513 006a ED        		.byte	-19
+ 514 006b EE        		.byte	-18
+ 515 006c F0        		.byte	-16
+ 516 006d F1        		.byte	-15
+ 517 006e F3        		.byte	-13
+ 518 006f F4        		.byte	-12
+ 519 0070 F5        		.byte	-11
+ 520 0071 F6        		.byte	-10
+ 521 0072 F8        		.byte	-8
+ 522 0073 F9        		.byte	-7
+ 523 0074 FA        		.byte	-6
+ 524 0075 FA        		.byte	-6
+ 525 0076 FB        		.byte	-5
+ 526 0077 FC        		.byte	-4
+ 527 0078 FD        		.byte	-3
+ 528 0079 FD        		.byte	-3
+ 529 007a FE        		.byte	-2
+ 530 007b FE        		.byte	-2
+ 531 007c FE        		.byte	-2
+ 532 007d FF        		.byte	-1
+ 533 007e FF        		.byte	-1
+ 534 007f FF        		.byte	-1
+ 535 0080 FF        		.byte	-1
+ 536 0081 FF        		.byte	-1
+ 537 0082 FF        		.byte	-1
+ 538 0083 FF        		.byte	-1
+ 539 0084 FE        		.byte	-2
+ 540 0085 FE        		.byte	-2
+ 541 0086 FE        		.byte	-2
+ 542 0087 FD        		.byte	-3
+ 543 0088 FD        		.byte	-3
+ 544 0089 FC        		.byte	-4
+ 545 008a FB        		.byte	-5
+ 546 008b FA        		.byte	-6
+ 547 008c FA        		.byte	-6
+ 548 008d F9        		.byte	-7
+ 549 008e F8        		.byte	-8
+ 550 008f F6        		.byte	-10
+ 551 0090 F5        		.byte	-11
+ 552 0091 F4        		.byte	-12
+ 553 0092 F3        		.byte	-13
+ 554 0093 F1        		.byte	-15
+ 555 0094 F0        		.byte	-16
+ 556 0095 EE        		.byte	-18
+ 557 0096 ED        		.byte	-19
+ 558 0097 EB        		.byte	-21
+ 559 0098 EA        		.byte	-22
+ 560 0099 E8        		.byte	-24
+ 561 009a E6        		.byte	-26
+ 562 009b E4        		.byte	-28
+ 563 009c E2        		.byte	-30
+ 564 009d E0        		.byte	-32
+ 565 009e DE        		.byte	-34
+ 566 009f DC        		.byte	-36
+ 567 00a0 DA        		.byte	-38
+ 568 00a1 D7        		.byte	-41
+ 569 00a2 D5        		.byte	-43
+ 570 00a3 D3        		.byte	-45
+ 571 00a4 D0        		.byte	-48
+ 572 00a5 CE        		.byte	-50
+ 573 00a6 CB        		.byte	-53
+ 574 00a7 C9        		.byte	-55
+ 575 00a8 C6        		.byte	-58
+ 576 00a9 C4        		.byte	-60
+ 577 00aa C1        		.byte	-63
+ 578 00ab BE        		.byte	-66
+ 579 00ac BC        		.byte	-68
+ 580 00ad B9        		.byte	-71
+ 581 00ae B6        		.byte	-74
+ 582 00af B3        		.byte	-77
+ 583 00b0 B0        		.byte	-80
+ 584 00b1 AD        		.byte	-83
+ 585 00b2 AA        		.byte	-86
+ 586 00b3 A7        		.byte	-89
+ 587 00b4 A5        		.byte	-91
+ 588 00b5 A2        		.byte	-94
+ 589 00b6 9E        		.byte	-98
+ 590 00b7 9B        		.byte	-101
+ 591 00b8 98        		.byte	-104
+ 592 00b9 95        		.byte	-107
+ 593 00ba 92        		.byte	-110
+ 594 00bb 8F        		.byte	-113
+ 595 00bc 8C        		.byte	-116
+ 596 00bd 89        		.byte	-119
+ 597 00be 86        		.byte	-122
+ 598 00bf 83        		.byte	-125
+ 599 00c0 80        		.byte	-128
+ 600 00c1 7C        		.byte	124
+ 601 00c2 79        		.byte	121
+ 602 00c3 76        		.byte	118
+ 603 00c4 73        		.byte	115
+ 604 00c5 70        		.byte	112
+ 605 00c6 6D        		.byte	109
+ 606 00c7 6A        		.byte	106
+ 607 00c8 67        		.byte	103
+ 608 00c9 64        		.byte	100
+ 609 00ca 61        		.byte	97
+ 610 00cb 5D        		.byte	93
+ 611 00cc 5A        		.byte	90
+ 612 00cd 58        		.byte	88
+ 613 00ce 55        		.byte	85
+ 614 00cf 52        		.byte	82
+ 615 00d0 4F        		.byte	79
+ 616 00d1 4C        		.byte	76
+ 617 00d2 49        		.byte	73
+ 618 00d3 46        		.byte	70
+ 619 00d4 43        		.byte	67
+ 620 00d5 41        		.byte	65
+ 621 00d6 3E        		.byte	62
+ 622 00d7 3B        		.byte	59
+ 623 00d8 39        		.byte	57
+ 624 00d9 36        		.byte	54
+ 625 00da 34        		.byte	52
+ 626 00db 31        		.byte	49
+ 627 00dc 2F        		.byte	47
+ 628 00dd 2C        		.byte	44
+ 629 00de 2A        		.byte	42
+ 630 00df 28        		.byte	40
+ 631 00e0 25        		.byte	37
+ 632 00e1 23        		.byte	35
+ 633 00e2 21        		.byte	33
+ 634 00e3 1F        		.byte	31
+ 635 00e4 1D        		.byte	29
+ 636 00e5 1B        		.byte	27
+ 637 00e6 19        		.byte	25
+ 638 00e7 17        		.byte	23
+ 639 00e8 15        		.byte	21
+ 640 00e9 14        		.byte	20
+ 641 00ea 12        		.byte	18
+ 642 00eb 11        		.byte	17
+ 643 00ec 0F        		.byte	15
+ 644 00ed 0E        		.byte	14
+ 645 00ee 0C        		.byte	12
+ 646 00ef 0B        		.byte	11
+ 647 00f0 0A        		.byte	10
+ 648 00f1 09        		.byte	9
+ 649 00f2 07        		.byte	7
+ 650 00f3 06        		.byte	6
+ 651 00f4 05        		.byte	5
+ 652 00f5 05        		.byte	5
+ 653 00f6 04        		.byte	4
+ 654 00f7 03        		.byte	3
+ 655 00f8 02        		.byte	2
+ 656 00f9 02        		.byte	2
+ 657 00fa 01        		.byte	1
+ 658 00fb 01        		.byte	1
+ 659 00fc 01        		.byte	1
+ 660 00fd 00        		.byte	0
+ 661 00fe 00        		.byte	0
+ 662 00ff 00        		.byte	0
+ 663               		.text
+ 664               	.Letext0:
+ 665               		.file 2 "d:\\applications\\keyboard\\avr-gcc-4.7.2-mingw32\\bin\\../lib/gcc/avr/4.7.2/../../../../
+DEFINED SYMBOLS
+                            *ABS*:00000000 backlight.c
+C:\Users\tiny\AppData\Local\Temp\ccjrxReO.s:2      *ABS*:0000003e __SP_H__
+C:\Users\tiny\AppData\Local\Temp\ccjrxReO.s:3      *ABS*:0000003d __SP_L__
+C:\Users\tiny\AppData\Local\Temp\ccjrxReO.s:4      *ABS*:0000003f __SREG__
+C:\Users\tiny\AppData\Local\Temp\ccjrxReO.s:5      *ABS*:00000000 __tmp_reg__
+C:\Users\tiny\AppData\Local\Temp\ccjrxReO.s:6      *ABS*:00000001 __zero_reg__
+C:\Users\tiny\AppData\Local\Temp\ccjrxReO.s:13     .text.pwm_led_init:00000000 pwm_led_init
+C:\Users\tiny\AppData\Local\Temp\ccjrxReO.s:395    .bss.is_init:00000000 is_init
+C:\Users\tiny\AppData\Local\Temp\ccjrxReO.s:63     .text.open_led:00000000 open_led
+C:\Users\tiny\AppData\Local\Temp\ccjrxReO.s:80     .text.close_led:00000000 close_led
+C:\Users\tiny\AppData\Local\Temp\ccjrxReO.s:97     .text.pwm_led_enable:00000000 pwm_led_enable
+C:\Users\tiny\AppData\Local\Temp\ccjrxReO.s:118    .text.pwm_led_disable:00000000 pwm_led_disable
+C:\Users\tiny\AppData\Local\Temp\ccjrxReO.s:139    .text.backlight_set:00000000 backlight_set
+C:\Users\tiny\AppData\Local\Temp\ccjrxReO.s:377    .bss.current_level:00000000 current_level
+C:\Users\tiny\AppData\Local\Temp\ccjrxReO.s:170    .text.tick:00000000 tick
+C:\Users\tiny\AppData\Local\Temp\ccjrxReO.s:371    .bss.duty_cycle:00000000 duty_cycle
+C:\Users\tiny\AppData\Local\Temp\ccjrxReO.s:365    .bss.pos:00000000 pos
+C:\Users\tiny\AppData\Local\Temp\ccjrxReO.s:406    .progmem.data.breathing_table:00000000 breathing_table
+C:\Users\tiny\AppData\Local\Temp\ccjrxReO.s:246    .text.__vector_17:00000000 __vector_17
+C:\Users\tiny\AppData\Local\Temp\ccjrxReO.s:401    .bss.acc:00000000 acc
+C:\Users\tiny\AppData\Local\Temp\ccjrxReO.s:389    .data.accuracy:00000000 accuracy
+C:\Users\tiny\AppData\Local\Temp\ccjrxReO.s:383    .data.speed:00000000 speed
+
+UNDEFINED SYMBOLS
+__do_copy_data
+__do_clear_bss

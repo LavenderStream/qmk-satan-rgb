@@ -169,6 +169,15 @@ void rgblight_decrease(void) {
 	rgblight_mode(mode);
 }
 
+void rgblight_pre(void) {
+	uint8_t mode;
+  mode = rgblight_config.mode - 1;
+  if (mode < 0) {
+    mode = 0;
+  }
+	rgblight_mode(mode);
+}
+
 void rgblight_step(void) {
 	uint8_t mode;
   mode = rgblight_config.mode + 1;

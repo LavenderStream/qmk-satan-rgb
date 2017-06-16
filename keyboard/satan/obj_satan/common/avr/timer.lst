@@ -1,0 +1,532 @@
+   1               		.file	"timer.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   7               		.text
+   8               	.Ltext0:
+   9               		.cfi_sections	.debug_frame
+  10               		.section	.text.timer_init,"ax",@progbits
+  11               	.global	timer_init
+  13               	timer_init:
+  14               	.LFB0:
+  15               		.file 1 "../../tmk_core/common/avr/timer.c"
+   1:../../tmk_core/common/avr/timer.c **** /*
+   2:../../tmk_core/common/avr/timer.c **** Copyright 2011 Jun Wako <wakojun@gmail.com>
+   3:../../tmk_core/common/avr/timer.c **** 
+   4:../../tmk_core/common/avr/timer.c **** This program is free software: you can redistribute it and/or modify
+   5:../../tmk_core/common/avr/timer.c **** it under the terms of the GNU General Public License as published by
+   6:../../tmk_core/common/avr/timer.c **** the Free Software Foundation, either version 2 of the License, or
+   7:../../tmk_core/common/avr/timer.c **** (at your option) any later version.
+   8:../../tmk_core/common/avr/timer.c **** 
+   9:../../tmk_core/common/avr/timer.c **** This program is distributed in the hope that it will be useful,
+  10:../../tmk_core/common/avr/timer.c **** but WITHOUT ANY WARRANTY; without even the implied warranty of
+  11:../../tmk_core/common/avr/timer.c **** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  12:../../tmk_core/common/avr/timer.c **** GNU General Public License for more details.
+  13:../../tmk_core/common/avr/timer.c **** 
+  14:../../tmk_core/common/avr/timer.c **** You should have received a copy of the GNU General Public License
+  15:../../tmk_core/common/avr/timer.c **** along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  16:../../tmk_core/common/avr/timer.c **** */
+  17:../../tmk_core/common/avr/timer.c **** 
+  18:../../tmk_core/common/avr/timer.c **** #include <avr/io.h>
+  19:../../tmk_core/common/avr/timer.c **** #include <avr/interrupt.h>
+  20:../../tmk_core/common/avr/timer.c **** #include <stdint.h>
+  21:../../tmk_core/common/avr/timer.c **** #include "timer_avr.h"
+  22:../../tmk_core/common/avr/timer.c **** #include "timer.h"
+  23:../../tmk_core/common/avr/timer.c **** 
+  24:../../tmk_core/common/avr/timer.c **** 
+  25:../../tmk_core/common/avr/timer.c **** // counter resolution 1ms
+  26:../../tmk_core/common/avr/timer.c **** // NOTE: union { uint32_t timer32; struct { uint16_t dummy; uint16_t timer16; }}
+  27:../../tmk_core/common/avr/timer.c **** volatile uint32_t timer_count = 0;
+  28:../../tmk_core/common/avr/timer.c **** 
+  29:../../tmk_core/common/avr/timer.c **** void timer_init(void)
+  30:../../tmk_core/common/avr/timer.c **** {
+  16               		.loc 1 30 0
+  17               		.cfi_startproc
+  18               	/* prologue: function */
+  19               	/* frame size = 0 */
+  20               	/* stack size = 0 */
+  21               	.L__stack_usage = 0
+  31:../../tmk_core/common/avr/timer.c ****     // Timer0 CTC mode
+  32:../../tmk_core/common/avr/timer.c ****     TCCR0A = 0x02;
+  22               		.loc 1 32 0
+  23 0000 82E0      		ldi r24,lo8(2)
+  24 0002 84BD      		out 0x24,r24
+  33:../../tmk_core/common/avr/timer.c **** 
+  34:../../tmk_core/common/avr/timer.c **** #if TIMER_PRESCALER == 1
+  35:../../tmk_core/common/avr/timer.c ****     TCCR0B = 0x01;
+  36:../../tmk_core/common/avr/timer.c **** #elif TIMER_PRESCALER == 8
+  37:../../tmk_core/common/avr/timer.c ****     TCCR0B = 0x02;
+  38:../../tmk_core/common/avr/timer.c **** #elif TIMER_PRESCALER == 64
+  39:../../tmk_core/common/avr/timer.c ****     TCCR0B = 0x03;
+  25               		.loc 1 39 0
+  26 0004 93E0      		ldi r25,lo8(3)
+  27 0006 95BD      		out 0x25,r25
+  40:../../tmk_core/common/avr/timer.c **** #elif TIMER_PRESCALER == 256
+  41:../../tmk_core/common/avr/timer.c ****     TCCR0B = 0x04;
+  42:../../tmk_core/common/avr/timer.c **** #elif TIMER_PRESCALER == 1024
+  43:../../tmk_core/common/avr/timer.c ****     TCCR0B = 0x05;
+  44:../../tmk_core/common/avr/timer.c **** #else
+  45:../../tmk_core/common/avr/timer.c **** #   error "Timer prescaler value is NOT vaild."
+  46:../../tmk_core/common/avr/timer.c **** #endif
+  47:../../tmk_core/common/avr/timer.c **** 
+  48:../../tmk_core/common/avr/timer.c ****     OCR0A = TIMER_RAW_TOP;
+  28               		.loc 1 48 0
+  29 0008 9AEF      		ldi r25,lo8(-6)
+  30 000a 97BD      		out 0x27,r25
+  49:../../tmk_core/common/avr/timer.c ****     TIMSK0 = (1<<OCIE0A);
+  31               		.loc 1 49 0
+  32 000c 8093 6E00 		sts 110,r24
+  33 0010 0895      		ret
+  34               		.cfi_endproc
+  35               	.LFE0:
+  37               		.section	.text.timer_clear,"ax",@progbits
+  38               	.global	timer_clear
+  40               	timer_clear:
+  41               	.LFB1:
+  50:../../tmk_core/common/avr/timer.c **** }
+  51:../../tmk_core/common/avr/timer.c **** 
+  52:../../tmk_core/common/avr/timer.c **** inline
+  53:../../tmk_core/common/avr/timer.c **** void timer_clear(void)
+  54:../../tmk_core/common/avr/timer.c **** {
+  42               		.loc 1 54 0
+  43               		.cfi_startproc
+  44               	/* prologue: function */
+  45               	/* frame size = 0 */
+  46               	/* stack size = 0 */
+  47               	.L__stack_usage = 0
+  55:../../tmk_core/common/avr/timer.c ****     uint8_t sreg = SREG;
+  48               		.loc 1 55 0
+  49 0000 8FB7      		in r24,__SREG__
+  50               	.LVL0:
+  56:../../tmk_core/common/avr/timer.c ****     cli();
+  51               		.loc 1 56 0
+  52               	/* #APP */
+  53               	 ;  56 "../../tmk_core/common/avr/timer.c" 1
+  54 0002 F894      		cli
+  55               	 ;  0 "" 2
+  57:../../tmk_core/common/avr/timer.c ****     timer_count = 0;
+  56               		.loc 1 57 0
+  57               	/* #NOAPP */
+  58 0004 1092 0000 		sts timer_count,__zero_reg__
+  59 0008 1092 0000 		sts timer_count+1,__zero_reg__
+  60 000c 1092 0000 		sts timer_count+2,__zero_reg__
+  61 0010 1092 0000 		sts timer_count+3,__zero_reg__
+  58:../../tmk_core/common/avr/timer.c ****     SREG = sreg;
+  62               		.loc 1 58 0
+  63 0014 8FBF      		out __SREG__,r24
+  64 0016 0895      		ret
+  65               		.cfi_endproc
+  66               	.LFE1:
+  68               		.section	.text.timer_read,"ax",@progbits
+  69               	.global	timer_read
+  71               	timer_read:
+  72               	.LFB2:
+  59:../../tmk_core/common/avr/timer.c **** }
+  60:../../tmk_core/common/avr/timer.c **** 
+  61:../../tmk_core/common/avr/timer.c **** inline
+  62:../../tmk_core/common/avr/timer.c **** uint16_t timer_read(void)
+  63:../../tmk_core/common/avr/timer.c **** {
+  73               		.loc 1 63 0
+  74               		.cfi_startproc
+  75               	/* prologue: function */
+  76               	/* frame size = 0 */
+  77               	/* stack size = 0 */
+  78               	.L__stack_usage = 0
+  64:../../tmk_core/common/avr/timer.c ****     uint32_t t;
+  65:../../tmk_core/common/avr/timer.c **** 
+  66:../../tmk_core/common/avr/timer.c ****     uint8_t sreg = SREG;
+  79               		.loc 1 66 0
+  80 0000 8FB7      		in r24,__SREG__
+  81               	.LVL1:
+  67:../../tmk_core/common/avr/timer.c ****     cli();
+  82               		.loc 1 67 0
+  83               	/* #APP */
+  84               	 ;  67 "../../tmk_core/common/avr/timer.c" 1
+  85 0002 F894      		cli
+  86               	 ;  0 "" 2
+  68:../../tmk_core/common/avr/timer.c ****     t = timer_count;
+  87               		.loc 1 68 0
+  88               	/* #NOAPP */
+  89 0004 4091 0000 		lds r20,timer_count
+  90 0008 5091 0000 		lds r21,timer_count+1
+  91 000c 6091 0000 		lds r22,timer_count+2
+  92 0010 7091 0000 		lds r23,timer_count+3
+  69:../../tmk_core/common/avr/timer.c ****     SREG = sreg;
+  93               		.loc 1 69 0
+  94 0014 8FBF      		out __SREG__,r24
+  70:../../tmk_core/common/avr/timer.c **** 
+  71:../../tmk_core/common/avr/timer.c ****     return (t & 0xFFFF);
+  72:../../tmk_core/common/avr/timer.c **** }
+  95               		.loc 1 72 0
+  96 0016 CA01      		movw r24,r20
+  97               	.LVL2:
+  98 0018 0895      		ret
+  99               		.cfi_endproc
+ 100               	.LFE2:
+ 102               		.section	.text.timer_read32,"ax",@progbits
+ 103               	.global	timer_read32
+ 105               	timer_read32:
+ 106               	.LFB3:
+  73:../../tmk_core/common/avr/timer.c **** 
+  74:../../tmk_core/common/avr/timer.c **** inline
+  75:../../tmk_core/common/avr/timer.c **** uint32_t timer_read32(void)
+  76:../../tmk_core/common/avr/timer.c **** {
+ 107               		.loc 1 76 0
+ 108               		.cfi_startproc
+ 109 0000 0F93      		push r16
+ 110               	.LCFI0:
+ 111               		.cfi_def_cfa_offset 3
+ 112               		.cfi_offset 16, -2
+ 113 0002 1F93      		push r17
+ 114               	.LCFI1:
+ 115               		.cfi_def_cfa_offset 4
+ 116               		.cfi_offset 17, -3
+ 117               	/* prologue: function */
+ 118               	/* frame size = 0 */
+ 119               	/* stack size = 2 */
+ 120               	.L__stack_usage = 2
+  77:../../tmk_core/common/avr/timer.c ****     uint32_t t;
+  78:../../tmk_core/common/avr/timer.c **** 
+  79:../../tmk_core/common/avr/timer.c ****     uint8_t sreg = SREG;
+ 121               		.loc 1 79 0
+ 122 0004 8FB7      		in r24,__SREG__
+ 123               	.LVL3:
+  80:../../tmk_core/common/avr/timer.c ****     cli();
+ 124               		.loc 1 80 0
+ 125               	/* #APP */
+ 126               	 ;  80 "../../tmk_core/common/avr/timer.c" 1
+ 127 0006 F894      		cli
+ 128               	 ;  0 "" 2
+  81:../../tmk_core/common/avr/timer.c ****     t = timer_count;
+ 129               		.loc 1 81 0
+ 130               	/* #NOAPP */
+ 131 0008 0091 0000 		lds r16,timer_count
+ 132 000c 1091 0000 		lds r17,timer_count+1
+ 133 0010 2091 0000 		lds r18,timer_count+2
+ 134 0014 3091 0000 		lds r19,timer_count+3
+ 135               	.LVL4:
+  82:../../tmk_core/common/avr/timer.c ****     SREG = sreg;
+ 136               		.loc 1 82 0
+ 137 0018 8FBF      		out __SREG__,r24
+  83:../../tmk_core/common/avr/timer.c **** 
+  84:../../tmk_core/common/avr/timer.c ****     return t;
+  85:../../tmk_core/common/avr/timer.c **** }
+ 138               		.loc 1 85 0
+ 139 001a B801      		movw r22,r16
+ 140 001c C901      		movw r24,r18
+ 141               	.LVL5:
+ 142               	/* epilogue start */
+ 143 001e 1F91      		pop r17
+ 144 0020 0F91      		pop r16
+ 145               	.LVL6:
+ 146 0022 0895      		ret
+ 147               		.cfi_endproc
+ 148               	.LFE3:
+ 150               		.section	.text.timer_elapsed,"ax",@progbits
+ 151               	.global	timer_elapsed
+ 153               	timer_elapsed:
+ 154               	.LFB4:
+  86:../../tmk_core/common/avr/timer.c **** 
+  87:../../tmk_core/common/avr/timer.c **** inline
+  88:../../tmk_core/common/avr/timer.c **** uint16_t timer_elapsed(uint16_t last)
+  89:../../tmk_core/common/avr/timer.c **** {
+ 155               		.loc 1 89 0
+ 156               		.cfi_startproc
+ 157               	.LVL7:
+ 158 0000 CF92      		push r12
+ 159               	.LCFI2:
+ 160               		.cfi_def_cfa_offset 3
+ 161               		.cfi_offset 12, -2
+ 162 0002 DF92      		push r13
+ 163               	.LCFI3:
+ 164               		.cfi_def_cfa_offset 4
+ 165               		.cfi_offset 13, -3
+ 166 0004 EF92      		push r14
+ 167               	.LCFI4:
+ 168               		.cfi_def_cfa_offset 5
+ 169               		.cfi_offset 14, -4
+ 170 0006 FF92      		push r15
+ 171               	.LCFI5:
+ 172               		.cfi_def_cfa_offset 6
+ 173               		.cfi_offset 15, -5
+ 174 0008 0F93      		push r16
+ 175               	.LCFI6:
+ 176               		.cfi_def_cfa_offset 7
+ 177               		.cfi_offset 16, -6
+ 178 000a 1F93      		push r17
+ 179               	.LCFI7:
+ 180               		.cfi_def_cfa_offset 8
+ 181               		.cfi_offset 17, -7
+ 182               	/* prologue: function */
+ 183               	/* frame size = 0 */
+ 184               	/* stack size = 6 */
+ 185               	.L__stack_usage = 6
+  90:../../tmk_core/common/avr/timer.c ****     uint32_t t;
+  91:../../tmk_core/common/avr/timer.c **** 
+  92:../../tmk_core/common/avr/timer.c ****     uint8_t sreg = SREG;
+ 186               		.loc 1 92 0
+ 187 000c 2FB7      		in r18,__SREG__
+ 188               	.LVL8:
+  93:../../tmk_core/common/avr/timer.c ****     cli();
+ 189               		.loc 1 93 0
+ 190               	/* #APP */
+ 191               	 ;  93 "../../tmk_core/common/avr/timer.c" 1
+ 192 000e F894      		cli
+ 193               	 ;  0 "" 2
+  94:../../tmk_core/common/avr/timer.c ****     t = timer_count;
+ 194               		.loc 1 94 0
+ 195               	/* #NOAPP */
+ 196 0010 4091 0000 		lds r20,timer_count
+ 197 0014 5091 0000 		lds r21,timer_count+1
+ 198 0018 6091 0000 		lds r22,timer_count+2
+ 199 001c 7091 0000 		lds r23,timer_count+3
+ 200               	.LVL9:
+  95:../../tmk_core/common/avr/timer.c ****     SREG = sreg;
+ 201               		.loc 1 95 0
+ 202 0020 2FBF      		out __SREG__,r18
+  96:../../tmk_core/common/avr/timer.c **** 
+  97:../../tmk_core/common/avr/timer.c ****     return TIMER_DIFF_16((t & 0xFFFF), last);
+ 203               		.loc 1 97 0
+ 204 0022 6A01      		movw r12,r20
+ 205 0024 7B01      		movw r14,r22
+ 206 0026 EE24      		clr r14
+ 207 0028 FF24      		clr r15
+ 208 002a 8C01      		movw r16,r24
+ 209 002c 20E0      		ldi r18,0
+ 210 002e 30E0      		ldi r19,0
+ 211               	.LVL10:
+ 212 0030 C016      		cp r12,r16
+ 213 0032 D106      		cpc r13,r17
+ 214 0034 E206      		cpc r14,r18
+ 215 0036 F306      		cpc r15,r19
+ 216 0038 00F0      		brlo .L6
+ 217               		.loc 1 97 0 is_stmt 0 discriminator 1
+ 218 003a 9A01      		movw r18,r20
+ 219 003c 281B      		sub r18,r24
+ 220 003e 390B      		sbc r19,r25
+ 221 0040 00C0      		rjmp .L7
+ 222               	.L6:
+ 223               		.loc 1 97 0 discriminator 2
+ 224 0042 9C01      		movw r18,r24
+ 225 0044 2095      		com r18
+ 226 0046 3095      		com r19
+ 227 0048 240F      		add r18,r20
+ 228 004a 351F      		adc r19,r21
+ 229               	.LVL11:
+ 230               	.L7:
+  98:../../tmk_core/common/avr/timer.c **** }
+ 231               		.loc 1 98 0 is_stmt 1 discriminator 3
+ 232 004c C901      		movw r24,r18
+ 233               	/* epilogue start */
+ 234 004e 1F91      		pop r17
+ 235 0050 0F91      		pop r16
+ 236               	.LVL12:
+ 237 0052 FF90      		pop r15
+ 238 0054 EF90      		pop r14
+ 239 0056 DF90      		pop r13
+ 240 0058 CF90      		pop r12
+ 241 005a 0895      		ret
+ 242               		.cfi_endproc
+ 243               	.LFE4:
+ 245               		.section	.text.timer_elapsed32,"ax",@progbits
+ 246               	.global	timer_elapsed32
+ 248               	timer_elapsed32:
+ 249               	.LFB5:
+  99:../../tmk_core/common/avr/timer.c **** 
+ 100:../../tmk_core/common/avr/timer.c **** inline
+ 101:../../tmk_core/common/avr/timer.c **** uint32_t timer_elapsed32(uint32_t last)
+ 102:../../tmk_core/common/avr/timer.c **** {
+ 250               		.loc 1 102 0
+ 251               		.cfi_startproc
+ 252               	.LVL13:
+ 253 0000 CF92      		push r12
+ 254               	.LCFI8:
+ 255               		.cfi_def_cfa_offset 3
+ 256               		.cfi_offset 12, -2
+ 257 0002 DF92      		push r13
+ 258               	.LCFI9:
+ 259               		.cfi_def_cfa_offset 4
+ 260               		.cfi_offset 13, -3
+ 261 0004 EF92      		push r14
+ 262               	.LCFI10:
+ 263               		.cfi_def_cfa_offset 5
+ 264               		.cfi_offset 14, -4
+ 265 0006 FF92      		push r15
+ 266               	.LCFI11:
+ 267               		.cfi_def_cfa_offset 6
+ 268               		.cfi_offset 15, -5
+ 269 0008 0F93      		push r16
+ 270               	.LCFI12:
+ 271               		.cfi_def_cfa_offset 7
+ 272               		.cfi_offset 16, -6
+ 273 000a 1F93      		push r17
+ 274               	.LCFI13:
+ 275               		.cfi_def_cfa_offset 8
+ 276               		.cfi_offset 17, -7
+ 277               	/* prologue: function */
+ 278               	/* frame size = 0 */
+ 279               	/* stack size = 6 */
+ 280               	.L__stack_usage = 6
+ 103:../../tmk_core/common/avr/timer.c ****     uint32_t t;
+ 104:../../tmk_core/common/avr/timer.c **** 
+ 105:../../tmk_core/common/avr/timer.c ****     uint8_t sreg = SREG;
+ 281               		.loc 1 105 0
+ 282 000c 4FB7      		in r20,__SREG__
+ 283               	.LVL14:
+ 106:../../tmk_core/common/avr/timer.c ****     cli();
+ 284               		.loc 1 106 0
+ 285               	/* #APP */
+ 286               	 ;  106 "../../tmk_core/common/avr/timer.c" 1
+ 287 000e F894      		cli
+ 288               	 ;  0 "" 2
+ 107:../../tmk_core/common/avr/timer.c ****     t = timer_count;
+ 289               		.loc 1 107 0
+ 290               	/* #NOAPP */
+ 291 0010 C090 0000 		lds r12,timer_count
+ 292 0014 D090 0000 		lds r13,timer_count+1
+ 293 0018 E090 0000 		lds r14,timer_count+2
+ 294 001c F090 0000 		lds r15,timer_count+3
+ 295               	.LVL15:
+ 108:../../tmk_core/common/avr/timer.c ****     SREG = sreg;
+ 296               		.loc 1 108 0
+ 297 0020 4FBF      		out __SREG__,r20
+ 109:../../tmk_core/common/avr/timer.c **** 
+ 110:../../tmk_core/common/avr/timer.c ****     return TIMER_DIFF_32(t, last);
+ 298               		.loc 1 110 0
+ 299 0022 C616      		cp r12,r22
+ 300 0024 D706      		cpc r13,r23
+ 301 0026 E806      		cpc r14,r24
+ 302 0028 F906      		cpc r15,r25
+ 303 002a 00F0      		brlo .L9
+ 304               		.loc 1 110 0 is_stmt 0 discriminator 1
+ 305 002c 9701      		movw r18,r14
+ 306 002e 8601      		movw r16,r12
+ 307 0030 061B      		sub r16,r22
+ 308 0032 170B      		sbc r17,r23
+ 309 0034 280B      		sbc r18,r24
+ 310 0036 390B      		sbc r19,r25
+ 311 0038 00C0      		rjmp .L10
+ 312               	.L9:
+ 313               		.loc 1 110 0 discriminator 2
+ 314 003a 8B01      		movw r16,r22
+ 315 003c 9C01      		movw r18,r24
+ 316 003e 0095      		com r16
+ 317 0040 1095      		com r17
+ 318 0042 2095      		com r18
+ 319 0044 3095      		com r19
+ 320 0046 0C0D      		add r16,r12
+ 321 0048 1D1D      		adc r17,r13
+ 322 004a 2E1D      		adc r18,r14
+ 323 004c 3F1D      		adc r19,r15
+ 324               	.L10:
+ 111:../../tmk_core/common/avr/timer.c **** }
+ 325               		.loc 1 111 0 is_stmt 1 discriminator 3
+ 326 004e B801      		movw r22,r16
+ 327               	.LVL16:
+ 328 0050 C901      		movw r24,r18
+ 329               	/* epilogue start */
+ 330 0052 1F91      		pop r17
+ 331 0054 0F91      		pop r16
+ 332 0056 FF90      		pop r15
+ 333 0058 EF90      		pop r14
+ 334 005a DF90      		pop r13
+ 335 005c CF90      		pop r12
+ 336               	.LVL17:
+ 337 005e 0895      		ret
+ 338               		.cfi_endproc
+ 339               	.LFE5:
+ 341               		.section	.text.__vector_21,"ax",@progbits
+ 342               	.global	__vector_21
+ 344               	__vector_21:
+ 345               	.LFB6:
+ 112:../../tmk_core/common/avr/timer.c **** 
+ 113:../../tmk_core/common/avr/timer.c **** // excecuted once per 1ms.(excess for just timer count?)
+ 114:../../tmk_core/common/avr/timer.c **** ISR(TIMER0_COMPA_vect)
+ 115:../../tmk_core/common/avr/timer.c **** {
+ 346               		.loc 1 115 0
+ 347               		.cfi_startproc
+ 348 0000 1F92      		push r1
+ 349               	.LCFI14:
+ 350               		.cfi_def_cfa_offset 3
+ 351               		.cfi_offset 1, -2
+ 352 0002 0F92      		push r0
+ 353               	.LCFI15:
+ 354               		.cfi_def_cfa_offset 4
+ 355               		.cfi_offset 0, -3
+ 356 0004 0FB6      		in r0,__SREG__
+ 357 0006 0F92      		push r0
+ 358 0008 1124      		clr __zero_reg__
+ 359 000a 8F93      		push r24
+ 360               	.LCFI16:
+ 361               		.cfi_def_cfa_offset 5
+ 362               		.cfi_offset 24, -4
+ 363 000c 9F93      		push r25
+ 364               	.LCFI17:
+ 365               		.cfi_def_cfa_offset 6
+ 366               		.cfi_offset 25, -5
+ 367 000e AF93      		push r26
+ 368               	.LCFI18:
+ 369               		.cfi_def_cfa_offset 7
+ 370               		.cfi_offset 26, -6
+ 371 0010 BF93      		push r27
+ 372               	.LCFI19:
+ 373               		.cfi_def_cfa_offset 8
+ 374               		.cfi_offset 27, -7
+ 375               	/* prologue: Signal */
+ 376               	/* frame size = 0 */
+ 377               	/* stack size = 7 */
+ 378               	.L__stack_usage = 7
+ 116:../../tmk_core/common/avr/timer.c ****     timer_count++;
+ 379               		.loc 1 116 0
+ 380 0012 8091 0000 		lds r24,timer_count
+ 381 0016 9091 0000 		lds r25,timer_count+1
+ 382 001a A091 0000 		lds r26,timer_count+2
+ 383 001e B091 0000 		lds r27,timer_count+3
+ 384 0022 0196      		adiw r24,1
+ 385 0024 A11D      		adc r26,__zero_reg__
+ 386 0026 B11D      		adc r27,__zero_reg__
+ 387 0028 8093 0000 		sts timer_count,r24
+ 388 002c 9093 0000 		sts timer_count+1,r25
+ 389 0030 A093 0000 		sts timer_count+2,r26
+ 390 0034 B093 0000 		sts timer_count+3,r27
+ 391               	/* epilogue start */
+ 117:../../tmk_core/common/avr/timer.c **** }
+ 392               		.loc 1 117 0
+ 393 0038 BF91      		pop r27
+ 394 003a AF91      		pop r26
+ 395 003c 9F91      		pop r25
+ 396 003e 8F91      		pop r24
+ 397 0040 0F90      		pop r0
+ 398 0042 0FBE      		out __SREG__,r0
+ 399 0044 0F90      		pop r0
+ 400 0046 1F90      		pop r1
+ 401 0048 1895      		reti
+ 402               		.cfi_endproc
+ 403               	.LFE6:
+ 405               	.global	timer_count
+ 406               		.section	.bss.timer_count,"aw",@nobits
+ 409               	timer_count:
+ 410 0000 0000 0000 		.zero	4
+ 411               		.text
+ 412               	.Letext0:
+ 413               		.file 2 "d:\\applications\\keyboard\\avr-gcc-4.7.2-mingw32\\bin\\../lib/gcc/avr/4.7.2/../../../../
+DEFINED SYMBOLS
+                            *ABS*:00000000 timer.c
+C:\Users\tiny\AppData\Local\Temp\ccW2WSUg.s:2      *ABS*:0000003e __SP_H__
+C:\Users\tiny\AppData\Local\Temp\ccW2WSUg.s:3      *ABS*:0000003d __SP_L__
+C:\Users\tiny\AppData\Local\Temp\ccW2WSUg.s:4      *ABS*:0000003f __SREG__
+C:\Users\tiny\AppData\Local\Temp\ccW2WSUg.s:5      *ABS*:00000000 __tmp_reg__
+C:\Users\tiny\AppData\Local\Temp\ccW2WSUg.s:6      *ABS*:00000001 __zero_reg__
+C:\Users\tiny\AppData\Local\Temp\ccW2WSUg.s:13     .text.timer_init:00000000 timer_init
+C:\Users\tiny\AppData\Local\Temp\ccW2WSUg.s:40     .text.timer_clear:00000000 timer_clear
+C:\Users\tiny\AppData\Local\Temp\ccW2WSUg.s:409    .bss.timer_count:00000000 timer_count
+C:\Users\tiny\AppData\Local\Temp\ccW2WSUg.s:71     .text.timer_read:00000000 timer_read
+C:\Users\tiny\AppData\Local\Temp\ccW2WSUg.s:105    .text.timer_read32:00000000 timer_read32
+C:\Users\tiny\AppData\Local\Temp\ccW2WSUg.s:153    .text.timer_elapsed:00000000 timer_elapsed
+C:\Users\tiny\AppData\Local\Temp\ccW2WSUg.s:248    .text.timer_elapsed32:00000000 timer_elapsed32
+C:\Users\tiny\AppData\Local\Temp\ccW2WSUg.s:344    .text.__vector_21:00000000 __vector_21
+
+UNDEFINED SYMBOLS
+__do_clear_bss

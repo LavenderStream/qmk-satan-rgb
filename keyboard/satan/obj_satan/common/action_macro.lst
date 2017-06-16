@@ -1,0 +1,578 @@
+   1               		.file	"action_macro.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   7               		.text
+   8               	.Ltext0:
+   9               		.cfi_sections	.debug_frame
+  10               		.section	.text.action_macro_play,"ax",@progbits
+  11               	.global	action_macro_play
+  13               	action_macro_play:
+  14               	.LFB103:
+  15               		.file 1 "../../tmk_core/common/action_macro.c"
+   1:../../tmk_core/common/action_macro.c **** /*
+   2:../../tmk_core/common/action_macro.c **** Copyright 2013 Jun Wako <wakojun@gmail.com>
+   3:../../tmk_core/common/action_macro.c **** 
+   4:../../tmk_core/common/action_macro.c **** This program is free software: you can redistribute it and/or modify
+   5:../../tmk_core/common/action_macro.c **** it under the terms of the GNU General Public License as published by
+   6:../../tmk_core/common/action_macro.c **** the Free Software Foundation, either version 2 of the License, or
+   7:../../tmk_core/common/action_macro.c **** (at your option) any later version.
+   8:../../tmk_core/common/action_macro.c **** 
+   9:../../tmk_core/common/action_macro.c **** This program is distributed in the hope that it will be useful,
+  10:../../tmk_core/common/action_macro.c **** but WITHOUT ANY WARRANTY; without even the implied warranty of
+  11:../../tmk_core/common/action_macro.c **** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  12:../../tmk_core/common/action_macro.c **** GNU General Public License for more details.
+  13:../../tmk_core/common/action_macro.c **** 
+  14:../../tmk_core/common/action_macro.c **** You should have received a copy of the GNU General Public License
+  15:../../tmk_core/common/action_macro.c **** along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  16:../../tmk_core/common/action_macro.c **** */
+  17:../../tmk_core/common/action_macro.c **** #include "action.h"
+  18:../../tmk_core/common/action_macro.c **** #include "action_util.h"
+  19:../../tmk_core/common/action_macro.c **** #include "action_macro.h"
+  20:../../tmk_core/common/action_macro.c **** #include "wait.h"
+  21:../../tmk_core/common/action_macro.c **** 
+  22:../../tmk_core/common/action_macro.c **** #ifdef DEBUG_ACTION
+  23:../../tmk_core/common/action_macro.c **** #include "debug.h"
+  24:../../tmk_core/common/action_macro.c **** #else
+  25:../../tmk_core/common/action_macro.c **** #include "nodebug.h"
+  26:../../tmk_core/common/action_macro.c **** #endif
+  27:../../tmk_core/common/action_macro.c **** 
+  28:../../tmk_core/common/action_macro.c **** 
+  29:../../tmk_core/common/action_macro.c **** #ifndef NO_ACTION_MACRO
+  30:../../tmk_core/common/action_macro.c **** 
+  31:../../tmk_core/common/action_macro.c **** #define MACRO_READ()  (macro = MACRO_GET(macro_p++))
+  32:../../tmk_core/common/action_macro.c **** void action_macro_play(const macro_t *macro_p)
+  33:../../tmk_core/common/action_macro.c **** {
+  16               		.loc 1 33 0
+  17               		.cfi_startproc
+  18               	.LVL0:
+  19 0000 DF92      		push r13
+  20               	.LCFI0:
+  21               		.cfi_def_cfa_offset 3
+  22               		.cfi_offset 13, -2
+  23 0002 EF92      		push r14
+  24               	.LCFI1:
+  25               		.cfi_def_cfa_offset 4
+  26               		.cfi_offset 14, -3
+  27 0004 FF92      		push r15
+  28               	.LCFI2:
+  29               		.cfi_def_cfa_offset 5
+  30               		.cfi_offset 15, -4
+  31 0006 0F93      		push r16
+  32               	.LCFI3:
+  33               		.cfi_def_cfa_offset 6
+  34               		.cfi_offset 16, -5
+  35 0008 1F93      		push r17
+  36               	.LCFI4:
+  37               		.cfi_def_cfa_offset 7
+  38               		.cfi_offset 17, -6
+  39 000a CF93      		push r28
+  40               	.LCFI5:
+  41               		.cfi_def_cfa_offset 8
+  42               		.cfi_offset 28, -7
+  43 000c DF93      		push r29
+  44               	.LCFI6:
+  45               		.cfi_def_cfa_offset 9
+  46               		.cfi_offset 29, -8
+  47               	/* prologue: function */
+  48               	/* frame size = 0 */
+  49               	/* stack size = 7 */
+  50               	.L__stack_usage = 7
+  51 000e EC01      		movw r28,r24
+  52               	.LVL1:
+  34:../../tmk_core/common/action_macro.c ****     macro_t macro = END;
+  35:../../tmk_core/common/action_macro.c ****     uint8_t interval = 0;
+  36:../../tmk_core/common/action_macro.c **** 
+  37:../../tmk_core/common/action_macro.c ****     if (!macro_p) return;
+  53               		.loc 1 37 0
+  54 0010 0097      		sbiw r24,0
+  55 0012 01F4      		brne .+2
+  56 0014 00C0      		rjmp .L1
+  57 0016 D12C      		mov r13,__zero_reg__
+  38:../../tmk_core/common/action_macro.c ****     while (true) {
+  39:../../tmk_core/common/action_macro.c ****         switch (MACRO_READ()) {
+  40:../../tmk_core/common/action_macro.c ****             case KEY_DOWN:
+  41:../../tmk_core/common/action_macro.c ****                 MACRO_READ();
+  42:../../tmk_core/common/action_macro.c ****                 dprintf("KEY_DOWN(%02X)\n", macro);
+  43:../../tmk_core/common/action_macro.c ****                 if (IS_MOD(macro)) {
+  44:../../tmk_core/common/action_macro.c ****                     add_weak_mods(MOD_BIT(macro));
+  58               		.loc 1 44 0
+  59 0018 EE24      		clr r14
+  60 001a E394      		inc r14
+  61 001c F12C      		mov r15,__zero_reg__
+  62               	.LVL2:
+  63               	.L17:
+  64               	.LBB13:
+  39:../../tmk_core/common/action_macro.c ****         switch (MACRO_READ()) {
+  65               		.loc 1 39 0
+  66 001e 8E01      		movw r16,r28
+  67 0020 0F5F      		subi r16,-1
+  68 0022 1F4F      		sbci r17,-1
+  69               	.LVL3:
+  70 0024 FE01      		movw r30,r28
+  71               	/* #APP */
+  72               	 ;  39 "../../tmk_core/common/action_macro.c" 1
+  73 0026 8491      		lpm r24, Z
+  74               		
+  75               	 ;  0 "" 2
+  76               	.LVL4:
+  77               	/* #NOAPP */
+  78               	.LBE13:
+  79 0028 8437      		cpi r24,lo8(116)
+  80 002a 00F4      		brsh .L9
+  81 002c 8430      		cpi r24,lo8(4)
+  82 002e 00F0      		brlo .+2
+  83 0030 00C0      		rjmp .L5
+  84 0032 8130      		cpi r24,lo8(1)
+  85 0034 01F0      		breq .L3
+  86 0036 8230      		cpi r24,lo8(2)
+  87 0038 01F0      		breq .+2
+  88 003a 00C0      		rjmp .L1
+  89 003c 00C0      		rjmp .L4
+  90               	.L9:
+  91 003e 8537      		cpi r24,lo8(117)
+  92 0040 01F4      		brne .+2
+  93 0042 00C0      		rjmp .L7
+  94 0044 00F0      		brlo .L6
+  95 0046 982F      		mov r25,r24
+  96 0048 9458      		subi r25,lo8(-(124))
+  97 004a 9037      		cpi r25,lo8(112)
+  98 004c 00F0      		brlo .+2
+  99 004e 00C0      		rjmp .L1
+ 100 0050 00C0      		rjmp .L21
+ 101               	.L3:
+ 102               	.LVL5:
+ 103               	.LBB14:
+  41:../../tmk_core/common/action_macro.c ****                 MACRO_READ();
+ 104               		.loc 1 41 0
+ 105 0052 2296      		adiw r28,2
+ 106               	.LVL6:
+ 107 0054 F801      		movw r30,r16
+ 108               	.LVL7:
+ 109               	/* #APP */
+ 110               	 ;  41 "../../tmk_core/common/action_macro.c" 1
+ 111 0056 8491      		lpm r24, Z
+ 112               		
+ 113               	 ;  0 "" 2
+ 114               	.LVL8:
+ 115               	/* #NOAPP */
+ 116               	.LBE14:
+  43:../../tmk_core/common/action_macro.c ****                 if (IS_MOD(macro)) {
+ 117               		.loc 1 43 0
+ 118 0058 982F      		mov r25,r24
+ 119 005a 905E      		subi r25,lo8(-(32))
+ 120 005c 9830      		cpi r25,lo8(8)
+ 121 005e 00F4      		brsh .L10
+ 122               		.loc 1 44 0
+ 123 0060 8770      		andi r24,lo8(7)
+ 124               	.LVL9:
+ 125 0062 FE2D      		mov r31,r14
+ 126 0064 00C0      		rjmp 2f
+ 127               		1:
+ 128 0066 FF0F      		lsl r31
+ 129               		2:
+ 130 0068 8A95      		dec r24
+ 131 006a 02F4      		brpl 1b
+ 132 006c 8F2F      		mov r24,r31
+ 133 006e 0E94 0000 		call add_weak_mods
+ 134               	.LVL10:
+ 135 0072 00C0      		rjmp .L22
+ 136               	.LVL11:
+ 137               	.L10:
+  45:../../tmk_core/common/action_macro.c ****                     send_keyboard_report();
+  46:../../tmk_core/common/action_macro.c ****                 } else {
+  47:../../tmk_core/common/action_macro.c ****                     register_code(macro);
+ 138               		.loc 1 47 0
+ 139 0074 0E94 0000 		call register_code
+ 140               	.LVL12:
+ 141 0078 00C0      		rjmp .L11
+ 142               	.LVL13:
+ 143               	.L4:
+ 144               	.LBB15:
+  48:../../tmk_core/common/action_macro.c ****                 }
+  49:../../tmk_core/common/action_macro.c ****                 break;
+  50:../../tmk_core/common/action_macro.c ****             case KEY_UP:
+  51:../../tmk_core/common/action_macro.c ****                 MACRO_READ();
+ 145               		.loc 1 51 0
+ 146 007a 2296      		adiw r28,2
+ 147               	.LVL14:
+ 148 007c F801      		movw r30,r16
+ 149               	.LVL15:
+ 150               	/* #APP */
+ 151               	 ;  51 "../../tmk_core/common/action_macro.c" 1
+ 152 007e 8491      		lpm r24, Z
+ 153               		
+ 154               	 ;  0 "" 2
+ 155               	.LVL16:
+ 156               	/* #NOAPP */
+ 157               	.LBE15:
+  52:../../tmk_core/common/action_macro.c ****                 dprintf("KEY_UP(%02X)\n", macro);
+  53:../../tmk_core/common/action_macro.c ****                 if (IS_MOD(macro)) {
+ 158               		.loc 1 53 0
+ 159 0080 982F      		mov r25,r24
+ 160 0082 905E      		subi r25,lo8(-(32))
+ 161 0084 9830      		cpi r25,lo8(8)
+ 162 0086 00F4      		brsh .L12
+  54:../../tmk_core/common/action_macro.c ****                     del_weak_mods(MOD_BIT(macro));
+ 163               		.loc 1 54 0
+ 164 0088 8770      		andi r24,lo8(7)
+ 165               	.LVL17:
+ 166 008a FE2D      		mov r31,r14
+ 167 008c 00C0      		rjmp 2f
+ 168               		1:
+ 169 008e FF0F      		lsl r31
+ 170               		2:
+ 171 0090 8A95      		dec r24
+ 172 0092 02F4      		brpl 1b
+ 173 0094 8F2F      		mov r24,r31
+ 174 0096 0E94 0000 		call del_weak_mods
+ 175               	.LVL18:
+ 176               	.L22:
+  55:../../tmk_core/common/action_macro.c ****                     send_keyboard_report();
+ 177               		.loc 1 55 0
+ 178 009a 0E94 0000 		call send_keyboard_report
+ 179               	.LVL19:
+ 180 009e 00C0      		rjmp .L11
+ 181               	.LVL20:
+ 182               	.L12:
+  56:../../tmk_core/common/action_macro.c ****                 } else {
+  57:../../tmk_core/common/action_macro.c ****                     unregister_code(macro);
+ 183               		.loc 1 57 0
+ 184 00a0 0E94 0000 		call unregister_code
+ 185               	.LVL21:
+ 186 00a4 00C0      		rjmp .L11
+ 187               	.LVL22:
+ 188               	.L6:
+ 189               	.LBB16:
+  58:../../tmk_core/common/action_macro.c ****                 }
+  59:../../tmk_core/common/action_macro.c ****                 break;
+  60:../../tmk_core/common/action_macro.c ****             case WAIT:
+  61:../../tmk_core/common/action_macro.c ****                 MACRO_READ();
+ 190               		.loc 1 61 0
+ 191 00a6 2296      		adiw r28,2
+ 192               	.LVL23:
+ 193 00a8 F801      		movw r30,r16
+ 194               	.LVL24:
+ 195               	/* #APP */
+ 196               	 ;  61 "../../tmk_core/common/action_macro.c" 1
+ 197 00aa 0491      		lpm r16, Z
+ 198               		
+ 199               	 ;  0 "" 2
+ 200               	.LVL25:
+ 201               	/* #NOAPP */
+ 202               	.LBE16:
+ 203               	.LBB17:
+  62:../../tmk_core/common/action_macro.c ****                 dprintf("WAIT(%u)\n", macro);
+  63:../../tmk_core/common/action_macro.c ****                 { uint8_t ms = macro; while (ms--) wait_ms(1); }
+ 204               		.loc 1 63 0
+ 205 00ac 00C0      		rjmp .L13
+ 206               	.LVL26:
+ 207               	.L14:
+ 208               	.LBB18:
+ 209               	.LBB19:
+ 210               		.file 2 "d:\\applications\\keyboard\\avr-gcc-4.7.2-mingw32\\bin\\../lib/gcc/avr/4.7.2/../../../../
+   1:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** /* Copyright (c) 2002, Marek Michalkiewicz
+   2:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****    Copyright (c) 2004,2005,2007 Joerg Wunsch
+   3:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****    Copyright (c) 2007  Florin-Viorel Petrov
+   4:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****    All rights reserved.
+   5:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 
+   6:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****    Redistribution and use in source and binary forms, with or without
+   7:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****    modification, are permitted provided that the following conditions are met:
+   8:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 
+   9:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****    * Redistributions of source code must retain the above copyright
+  10:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****      notice, this list of conditions and the following disclaimer.
+  11:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 
+  12:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****    * Redistributions in binary form must reproduce the above copyright
+  13:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****      notice, this list of conditions and the following disclaimer in
+  14:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****      the documentation and/or other materials provided with the
+  15:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****      distribution.
+  16:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 
+  17:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****    * Neither the name of the copyright holders nor the names of
+  18:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****      contributors may be used to endorse or promote products derived
+  19:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****      from this software without specific prior written permission.
+  20:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 
+  21:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  22:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  23:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  24:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****   ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+  25:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****   LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+  26:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****   CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+  27:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****   SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+  28:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+  29:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****   CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+  30:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+  31:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****   POSSIBILITY OF SUCH DAMAGE. */
+  32:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 
+  33:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** /* $Id: delay.h.in 2251 2011-09-14 08:20:33Z joerg_wunsch $ */
+  34:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 
+  35:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** #ifndef _UTIL_DELAY_H_
+  36:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** #define _UTIL_DELAY_H_ 1
+  37:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 
+  38:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** #ifndef __HAS_DELAY_CYCLES
+  39:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** #define __HAS_DELAY_CYCLES 1
+  40:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** #endif
+  41:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 
+  42:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** #include <inttypes.h>
+  43:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** #include <util/delay_basic.h>
+  44:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** #include <math.h>
+  45:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 
+  46:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** /** \file */
+  47:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** /** \defgroup util_delay <util/delay.h>: Convenience functions for busy-wait delay loops
+  48:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****     \code
+  49:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****     #define F_CPU 1000000UL  // 1 MHz
+  50:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****     //#define F_CPU 14.7456E6
+  51:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****     #include <util/delay.h>
+  52:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****     \endcode
+  53:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 
+  54:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****     \note As an alternative method, it is possible to pass the
+  55:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****     F_CPU macro down to the compiler from the Makefile.
+  56:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****     Obviously, in that case, no \c \#define statement should be
+  57:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****     used.
+  58:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 
+  59:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****     The functions in this header file are wrappers around the basic
+  60:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****     busy-wait functions from <util/delay_basic.h>.  They are meant as
+  61:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****     convenience functions where actual time values can be specified
+  62:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****     rather than a number of cycles to wait for.  The idea behind is
+  63:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****     that compile-time constant expressions will be eliminated by
+  64:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****     compiler optimization so floating-point expressions can be used
+  65:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****     to calculate the number of delay cycles needed based on the CPU
+  66:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****     frequency passed by the macro F_CPU.
+  67:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 
+  68:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****     \note In order for these functions to work as intended, compiler
+  69:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****     optimizations <em>must</em> be enabled, and the delay time
+  70:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****     <em>must</em> be an expression that is a known constant at
+  71:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****     compile-time.  If these requirements are not met, the resulting
+  72:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****     delay will be much longer (and basically unpredictable), and
+  73:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****     applications that otherwise do not use floating-point calculations
+  74:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****     will experience severe code bloat by the floating-point library
+  75:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****     routines linked into the application.
+  76:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 
+  77:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****     The functions available allow the specification of microsecond, and
+  78:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****     millisecond delays directly, using the application-supplied macro
+  79:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****     F_CPU as the CPU clock frequency (in Hertz).
+  80:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 
+  81:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** */
+  82:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 
+  83:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** #if !defined(__DOXYGEN__)
+  84:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** static inline void _delay_us(double __us) __attribute__((always_inline));
+  85:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** static inline void _delay_ms(double __ms) __attribute__((always_inline));
+  86:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** #endif
+  87:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 
+  88:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** #ifndef F_CPU
+  89:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** /* prevent compiler error by supplying a default */
+  90:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** # warning "F_CPU not defined for <util/delay.h>"
+  91:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** # define F_CPU 1000000UL
+  92:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** #endif
+  93:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 
+  94:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** #ifndef __OPTIMIZE__
+  95:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** # warning "Compiler optimizations disabled; functions from <util/delay.h> won't work as designed"
+  96:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** #endif
+  97:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 
+  98:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** #if __HAS_DELAY_CYCLES && defined(__OPTIMIZE__) && \
+  99:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****   !defined(__DELAY_BACKWARD_COMPATIBLE__) &&	   \
+ 100:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****   __STDC_HOSTED__
+ 101:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** #  include <math.h>
+ 102:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** #endif
+ 103:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 
+ 104:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** /**
+ 105:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****    \ingroup util_delay
+ 106:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 
+ 107:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****    Perform a delay of \c __ms milliseconds, using _delay_loop_2().
+ 108:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 
+ 109:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****    The macro F_CPU is supposed to be defined to a
+ 110:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****    constant defining the CPU clock frequency (in Hertz).
+ 111:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 
+ 112:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****    The maximal possible delay is 262.14 ms / F_CPU in MHz.
+ 113:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 
+ 114:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****    When the user request delay which exceed the maximum possible one,
+ 115:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****    _delay_ms() provides a decreased resolution functionality. In this
+ 116:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****    mode _delay_ms() will work with a resolution of 1/10 ms, providing
+ 117:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****    delays up to 6.5535 seconds (independent from CPU frequency).  The
+ 118:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****    user will not be informed about decreased resolution.
+ 119:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 
+ 120:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****    If the avr-gcc toolchain has __builtin_avr_delay_cycles(unsigned long)
+ 121:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****    support, maximal possible delay is 4294967.295 ms/ F_CPU in MHz. For
+ 122:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****    values greater than the maximal possible delay, overflows results in
+ 123:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****    no delay i.e., 0ms.
+ 124:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 
+ 125:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****    Conversion of __us into clock cycles may not always result in integer.
+ 126:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****    By default, the clock cycles rounded up to next integer. This ensures that
+ 127:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****    the user gets atleast __us microseconds of delay.
+ 128:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 
+ 129:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****    Alternatively, user can define __DELAY_ROUND_DOWN__ and __DELAY_ROUND_CLOSEST__
+ 130:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****    to round down and round to closest integer.
+ 131:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 
+ 132:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****    Note: The new implementation of _delay_ms(double __ms) with 
+ 133:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****     __builtin_avr_delay_cycles(unsigned long) support is not backward compatible. 
+ 134:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****    User can define __DELAY_BACKWARD_COMPATIBLE__ to get a backward compatible delay.
+ 135:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****    Also, the backward compatible
+ 136:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****    algorithm will be chosen if the code is compiled in a <em>freestanding
+ 137:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****    environment</em> (GCC option \c -ffreestanding), as the math functions
+ 138:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****    required for rounding are not available to the compiler then.
+ 139:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 
+ 140:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****  */
+ 141:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** void
+ 142:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** _delay_ms(double __ms)
+ 143:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** {
+ 144:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 	uint16_t __ticks;
+ 145:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 	double __tmp ; 
+ 146:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** #if __HAS_DELAY_CYCLES && defined(__OPTIMIZE__) && \
+ 147:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****   !defined(__DELAY_BACKWARD_COMPATIBLE__) &&	   \
+ 148:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h ****   __STDC_HOSTED__
+ 149:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 	uint32_t __ticks_dc;
+ 150:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 	extern void __builtin_avr_delay_cycles(unsigned long);
+ 151:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 	__tmp = ((F_CPU) / 1e3) * __ms;
+ 152:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 
+ 153:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 	#if defined(__DELAY_ROUND_DOWN__)
+ 154:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 		__ticks_dc = (uint32_t)fabs(__tmp);
+ 155:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 
+ 156:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 	#elif defined(__DELAY_ROUND_CLOSEST__)
+ 157:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 		__ticks_dc = (uint32_t)(fabs(__tmp)+0.5);
+ 158:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 
+ 159:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 	#else
+ 160:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 		//round up by default
+ 161:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+ 162:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 	#endif
+ 163:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 
+ 164:d:\applications\keyboard\avr-gcc-4.7.2-mingw32\bin\../lib/gcc/avr/4.7.2/../../../../avr/include/util\delay.h **** 	__builtin_avr_delay_cycles(__ticks_dc);
+ 211               		.loc 2 164 0
+ 212 00ae 8FE9      		ldi r24,lo8(3999)
+ 213 00b0 9FE0      		ldi r25,hi8(3999)
+ 214 00b2 0197      		1: sbiw r24,1
+ 215 00b4 01F4      		brne 1b
+ 216 00b6 00C0      		rjmp .
+ 217 00b8 0000      		nop
+ 218 00ba 0150      		subi r16,lo8(-(-1))
+ 219               	.LVL27:
+ 220               	.L13:
+ 221               	.LBE19:
+ 222               	.LBE18:
+ 223               		.loc 1 63 0 discriminator 1
+ 224 00bc 0111      		cpse r16,__zero_reg__
+ 225 00be 00C0      		rjmp .L14
+ 226 00c0 00C0      		rjmp .L11
+ 227               	.LVL28:
+ 228               	.L7:
+ 229               	.LBE17:
+ 230               	.LBB20:
+  64:../../tmk_core/common/action_macro.c ****                 break;
+  65:../../tmk_core/common/action_macro.c ****             case INTERVAL:
+  66:../../tmk_core/common/action_macro.c ****                 interval = MACRO_READ();
+ 231               		.loc 1 66 0
+ 232 00c2 2296      		adiw r28,2
+ 233               	.LVL29:
+ 234 00c4 F801      		movw r30,r16
+ 235               	.LVL30:
+ 236               	/* #APP */
+ 237               	 ;  66 "../../tmk_core/common/action_macro.c" 1
+ 238 00c6 D490      		lpm r13, Z
+ 239               		
+ 240               	 ;  0 "" 2
+ 241               	.LVL31:
+ 242               	/* #NOAPP */
+ 243               	.LBE20:
+  67:../../tmk_core/common/action_macro.c ****                 dprintf("INTERVAL(%u)\n", interval);
+  68:../../tmk_core/common/action_macro.c ****                 break;
+ 244               		.loc 1 68 0
+ 245 00c8 00C0      		rjmp .L11
+ 246               	.LVL32:
+ 247               	.L5:
+  69:../../tmk_core/common/action_macro.c ****             case 0x04 ... 0x73:
+  70:../../tmk_core/common/action_macro.c ****                 dprintf("DOWN(%02X)\n", macro);
+  71:../../tmk_core/common/action_macro.c ****                 register_code(macro);
+ 248               		.loc 1 71 0
+ 249 00ca 0E94 0000 		call register_code
+ 250               	.LVL33:
+ 251 00ce 00C0      		rjmp .L23
+ 252               	.LVL34:
+ 253               	.L21:
+  72:../../tmk_core/common/action_macro.c ****                 break;
+  73:../../tmk_core/common/action_macro.c ****             case 0x84 ... 0xF3:
+  74:../../tmk_core/common/action_macro.c ****                 dprintf("UP(%02X)\n", macro);
+  75:../../tmk_core/common/action_macro.c ****                 unregister_code(macro&0x7F);
+ 254               		.loc 1 75 0
+ 255 00d0 8F77      		andi r24,lo8(127)
+ 256               	.LVL35:
+ 257 00d2 0E94 0000 		call unregister_code
+ 258               	.LVL36:
+ 259               	.L23:
+  39:../../tmk_core/common/action_macro.c ****         switch (MACRO_READ()) {
+ 260               		.loc 1 39 0
+ 261 00d6 E801      		movw r28,r16
+ 262               	.LVL37:
+ 263               	.L11:
+ 264               	.LBB21:
+  76:../../tmk_core/common/action_macro.c ****                 break;
+  77:../../tmk_core/common/action_macro.c ****             case END:
+  78:../../tmk_core/common/action_macro.c ****             default:
+  79:../../tmk_core/common/action_macro.c ****                 return;
+  80:../../tmk_core/common/action_macro.c ****         }
+  81:../../tmk_core/common/action_macro.c ****         // interval
+  82:../../tmk_core/common/action_macro.c ****         { uint8_t ms = interval; while (ms--) wait_ms(1); }
+ 265               		.loc 1 82 0
+ 266 00d8 8D2D      		mov r24,r13
+ 267 00da 00C0      		rjmp .L15
+ 268               	.LVL38:
+ 269               	.L16:
+ 270 00dc 8150      		subi r24,lo8(-(-1))
+ 271               	.LVL39:
+ 272               	.LBB22:
+ 273               	.LBB23:
+ 274               		.loc 2 164 0
+ 275 00de EFE9      		ldi r30,lo8(3999)
+ 276 00e0 FFE0      		ldi r31,hi8(3999)
+ 277 00e2 3197      		1: sbiw r30,1
+ 278 00e4 01F4      		brne 1b
+ 279 00e6 00C0      		rjmp .
+ 280 00e8 0000      		nop
+ 281               	.LVL40:
+ 282               	.L15:
+ 283               	.LBE23:
+ 284               	.LBE22:
+ 285               		.loc 1 82 0 discriminator 1
+ 286 00ea 8823      		tst r24
+ 287 00ec 01F4      		brne .+2
+ 288 00ee 00C0      		rjmp .L17
+ 289 00f0 00C0      		rjmp .L16
+ 290               	.LVL41:
+ 291               	.L1:
+ 292               	/* epilogue start */
+ 293               	.LBE21:
+  83:../../tmk_core/common/action_macro.c ****     }
+  84:../../tmk_core/common/action_macro.c **** }
+ 294               		.loc 1 84 0
+ 295 00f2 DF91      		pop r29
+ 296 00f4 CF91      		pop r28
+ 297 00f6 1F91      		pop r17
+ 298 00f8 0F91      		pop r16
+ 299 00fa FF90      		pop r15
+ 300 00fc EF90      		pop r14
+ 301 00fe DF90      		pop r13
+ 302 0100 0895      		ret
+ 303               		.cfi_endproc
+ 304               	.LFE103:
+ 306               		.text
+ 307               	.Letext0:
+ 308               		.file 3 "d:\\applications\\keyboard\\avr-gcc-4.7.2-mingw32\\bin\\../lib/gcc/avr/4.7.2/../../../../
+ 309               		.file 4 "../../tmk_core/common/action_macro.h"
+ 310               		.file 5 "../../tmk_core/common/keycode.h"
+ 311               		.file 6 "../../tmk_core/common/action_util.h"
+ 312               		.file 7 "../../tmk_core/common/action.h"
+ 313               		.file 8 "../../tmk_core/protocol/lufa/LUFA-git/LUFA/Drivers/USB/Core/USBTask.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 action_macro.c
+C:\Users\tiny\AppData\Local\Temp\ccNPcICa.s:2      *ABS*:0000003e __SP_H__
+C:\Users\tiny\AppData\Local\Temp\ccNPcICa.s:3      *ABS*:0000003d __SP_L__
+C:\Users\tiny\AppData\Local\Temp\ccNPcICa.s:4      *ABS*:0000003f __SREG__
+C:\Users\tiny\AppData\Local\Temp\ccNPcICa.s:5      *ABS*:00000000 __tmp_reg__
+C:\Users\tiny\AppData\Local\Temp\ccNPcICa.s:6      *ABS*:00000001 __zero_reg__
+C:\Users\tiny\AppData\Local\Temp\ccNPcICa.s:13     .text.action_macro_play:00000000 action_macro_play
+
+UNDEFINED SYMBOLS
+add_weak_mods
+register_code
+del_weak_mods
+send_keyboard_report
+unregister_code

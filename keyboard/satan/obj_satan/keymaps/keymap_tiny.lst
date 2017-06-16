@@ -1,0 +1,1024 @@
+   1               		.file	"keymap_tiny.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   7               		.text
+   8               	.Ltext0:
+   9               		.cfi_sections	.debug_frame
+  10               		.section	.text.action_function,"ax",@progbits
+  11               	.global	action_function
+  13               	action_function:
+  14               	.LFB103:
+  15               		.file 1 "keymaps/keymap_tiny.c"
+   1:keymaps/keymap_tiny.c **** /*
+   2:keymaps/keymap_tiny.c ****  * This is the canonical layout file for the Quantum project. If you want to add
+   3:keymaps/keymap_tiny.c ****  * another keyboard,
+   4:keymaps/keymap_tiny.c ****  * this is the style you want to emulate.
+   5:keymaps/keymap_tiny.c ****  */
+   6:keymaps/keymap_tiny.c **** 
+   7:keymaps/keymap_tiny.c **** #include "satan.h"
+   8:keymaps/keymap_tiny.c **** 
+   9:keymaps/keymap_tiny.c **** 
+  10:keymaps/keymap_tiny.c **** /*
+  11:keymaps/keymap_tiny.c ****  * Each layer gets a name for readability, which is then used in the keymap
+  12:keymaps/keymap_tiny.c ****  * matrix below.
+  13:keymaps/keymap_tiny.c ****  * The underscores don't mean anything - you can have a layer called STUFF or
+  14:keymaps/keymap_tiny.c ****  * any other name.
+  15:keymaps/keymap_tiny.c ****  * Layer names don't all need to be of the same length, obviously, and you can
+  16:keymaps/keymap_tiny.c ****  * also skip them
+  17:keymaps/keymap_tiny.c ****  * entirely and just use numbers.
+  18:keymaps/keymap_tiny.c ****  */
+  19:keymaps/keymap_tiny.c **** #define _BW	0
+  20:keymaps/keymap_tiny.c **** #define _BM	1
+  21:keymaps/keymap_tiny.c **** #define _FL	2
+  22:keymaps/keymap_tiny.c **** #define _MV	3
+  23:keymaps/keymap_tiny.c **** 
+  24:keymaps/keymap_tiny.c **** 
+  25:keymaps/keymap_tiny.c **** /*
+  26:keymaps/keymap_tiny.c ****  * MACRO
+  27:keymaps/keymap_tiny.c ****  */
+  28:keymaps/keymap_tiny.c **** #define _EMAIL		0
+  29:keymaps/keymap_tiny.c **** 
+  30:keymaps/keymap_tiny.c **** const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
+  31:keymaps/keymap_tiny.c **** 	/* Keymap _BW: (Base Windows) Windows Default Layer
+  32:keymaps/keymap_tiny.c **** 	 * ,-----------------------------------------------------------.
+  33:keymaps/keymap_tiny.c **** 	 * |Esc~| 1| 2| 3| 4| 5| 6| 7| 8| 9| 0| -| =|Backsp |
+  34:keymaps/keymap_tiny.c **** 	 * |-----------------------------------------------------------|
+  35:keymaps/keymap_tiny.c **** 	 * |Tab | Q| W| E| R| T| Y| U| I| O| P| [| ]| \|
+  36:keymaps/keymap_tiny.c **** 	 * |-----------------------------------------------------------|
+  37:keymaps/keymap_tiny.c **** 	 * |CAPS| A| S| D| F| G| H| J| K| L| ;| '|Return |
+  38:keymaps/keymap_tiny.c **** 	 * |-----------------------------------------------------------|
+  39:keymaps/keymap_tiny.c **** 	 * |Shift | Z| X| C| V| B| N| M| ,| .| /|Shift |
+  40:keymaps/keymap_tiny.c **** 	 * |-----------------------------------------------------------|
+  41:keymaps/keymap_tiny.c **** 	 * |Ctrl|Gui |Alt | Space |Fl |Gui |CTRL| _MV |
+  42:keymaps/keymap_tiny.c **** 	 * `-----------------------------------------------------------'
+  43:keymaps/keymap_tiny.c **** 	 */
+  44:keymaps/keymap_tiny.c **** 	[_BW] = KEYMAP(
+  45:keymaps/keymap_tiny.c **** 		F( 0 ),										 KC_1,	 KC_2, KC_3, KC_4, KC_5, KC_6,	KC_7,	 KC_8,	 KC_9,	 KC_0, KC_MINS, KC_EQL
+  46:keymaps/keymap_tiny.c **** 		KC_TAB,										 KC_Q,	 KC_W, KC_E, KC_R, KC_T, KC_Y,	KC_U,	 KC_I,	 KC_O,	 KC_P, KC_LBRC, KC_RBR
+  47:keymaps/keymap_tiny.c **** 		KC_CAPS,									 KC_A,	 KC_S, KC_D, KC_F, KC_G, KC_H,	KC_J,	 KC_K,	 KC_L,	 KC_SCLN, KC_QUOT, KC_
+  48:keymaps/keymap_tiny.c **** 		KC_LSFT,									 KC_Z,	 KC_X, KC_C, KC_V, KC_B, KC_N,	KC_M,	 KC_COMM, KC_DOT, KC_SLSH, KC_LSFT,
+  49:keymaps/keymap_tiny.c **** 		KC_LCTL,									 KC_LGUI, KC_LALT, KC_SPC, F( 10 ), KC_LEFT, F( 11 ), KC_RGHT ),
+  50:keymaps/keymap_tiny.c **** 
+  51:keymaps/keymap_tiny.c **** 
+  52:keymaps/keymap_tiny.c **** 	/* Keymap _BM: (Base Mac) Mac Default Layer
+  53:keymaps/keymap_tiny.c **** 	 * ,-----------------------------------------------------------.
+  54:keymaps/keymap_tiny.c **** 	 * |Esc~| 1| 2| 3| 4| 5| 6| 7| 8| 9| 0| -| =|Backsp |
+  55:keymaps/keymap_tiny.c **** 	 * |-----------------------------------------------------------|
+  56:keymaps/keymap_tiny.c **** 	 * |Tab | Q| W| E| R| T| Y| U| I| O| P| [| ]| \|
+  57:keymaps/keymap_tiny.c **** 	 * |-----------------------------------------------------------|
+  58:keymaps/keymap_tiny.c **** 	 * |CAPS/FL| A| S| D| F| G| H| J| K| L| ;| '|Return |
+  59:keymaps/keymap_tiny.c **** 	 * |-----------------------------------------------------------|
+  60:keymaps/keymap_tiny.c **** 	 * |Shift | Z| X| C| V| B| N| M| ,| .| /|Shift |
+  61:keymaps/keymap_tiny.c **** 	 * |-----------------------------------------------------------|
+  62:keymaps/keymap_tiny.c **** 	 * |Ctrl|Alt |Gui | Space |Gui |Alt |CTRL |_FL |
+  63:keymaps/keymap_tiny.c **** 	 * `-----------------------------------------------------------'
+  64:keymaps/keymap_tiny.c **** 	 */
+  65:keymaps/keymap_tiny.c **** 	[_BM] = KEYMAP(
+  66:keymaps/keymap_tiny.c **** 		F( 0 ),										 KC_1,	 KC_2, KC_3, KC_4, KC_5, KC_6,	KC_7,	 KC_8,
+  67:keymaps/keymap_tiny.c **** 		KC_9,										 KC_0,	 KC_MINS, KC_EQL, KC_BSPC, KC_TAB, KC_Q,	KC_W,
+  68:keymaps/keymap_tiny.c **** 		KC_E,										 KC_R,	 KC_T, KC_Y, KC_U, KC_I, KC_O,	KC_P,	 KC_LBRC,
+  69:keymaps/keymap_tiny.c **** 		KC_RBRC,									 KC_BSLS, F( 11 ), KC_A, KC_S, KC_D, KC_F,	KC_G,
+  70:keymaps/keymap_tiny.c **** 		KC_H,										 KC_J,	 KC_K, KC_L, KC_SCLN, KC_QUOT, KC_ENT,
+  71:keymaps/keymap_tiny.c **** 		KC_LSFT,									 KC_Z,	 KC_X, KC_C, KC_V, KC_B, KC_N,	KC_M,
+  72:keymaps/keymap_tiny.c **** 		KC_COMM,									 KC_DOT, KC_SLSH, KC_RSFT, KC_LCTL, KC_LALT,
+  73:keymaps/keymap_tiny.c **** 		KC_LGUI,									 KC_SPC, KC_RGUI, KC_RALT, KC_RCTL, F( 9 ) ),
+  74:keymaps/keymap_tiny.c **** 
+  75:keymaps/keymap_tiny.c **** 
+  76:keymaps/keymap_tiny.c **** 	/* Keymap _FL: Function Layer
+  77:keymaps/keymap_tiny.c **** 	 * ,-----------------------------------------------------------.
+  78:keymaps/keymap_tiny.c **** 	 * | `| F1| F2| F3| F4| F5| F6| F7| F8| F9|F10|F11|F12|Delete |
+  79:keymaps/keymap_tiny.c **** 	 * |-----------------------------------------------------------|
+  80:keymaps/keymap_tiny.c **** 	 * | | |Up | |Cal|Ins| |PgUp| | |Psc|Slk|Pau| |
+  81:keymaps/keymap_tiny.c **** 	 * |-----------------------------------------------------------|
+  82:keymaps/keymap_tiny.c **** 	 * | |Lef|Dow|Rig| |Hom|Lef|Dow|Up |Rig|End| | |
+  83:keymaps/keymap_tiny.c **** 	 * |-----------------------------------------------------------|
+  84:keymaps/keymap_tiny.c **** 	 * | |BL-|BL |BL+|F1 | |PgDn| |VoD|Mut|VoU| PgUp |
+  85:keymaps/keymap_tiny.c **** 	 * |-----------------------------------------------------------|
+  86:keymaps/keymap_tiny.c **** 	 * | | | | |App |Home|PgDn| |
+  87:keymaps/keymap_tiny.c **** 	 * `-----------------------------------------------------------'
+  88:keymaps/keymap_tiny.c **** 	 */
+  89:keymaps/keymap_tiny.c **** 	[_FL] =
+  90:keymaps/keymap_tiny.c **** 		KEYMAP(
+  91:keymaps/keymap_tiny.c **** 			KC_GRV,									 KC_F1, KC_F2, KC_F3, KC_F4, KC_F5, KC_F6,	KC_F7,	 KC_F8,	 KC_F9, KC_F10, KC_F11
+  92:keymaps/keymap_tiny.c **** 			KC_TRNS,								 F( 12 ), KC_UP, F( 13 ), KC_TRNS, KC_INS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, K
+  93:keymaps/keymap_tiny.c **** 			KC_TRNS,								 KC_LEFT, KC_DOWN, KC_RGHT, KC_TRNS, KC_HOME, KC_LEFT, KC_DOWN, KC_UP,	 KC_RGHT,
+  94:keymaps/keymap_tiny.c **** 			KC_TRNS,								 KC_VOLD, KC_VOLU, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS
+  95:keymaps/keymap_tiny.c **** 			KC_MPRV,								 KC_MPLY, KC_MNXT, KC_TRNS, KC_DOWN, KC_LEFT, KC_TRNS, KC_RGHT ),
+  96:keymaps/keymap_tiny.c **** 
+  97:keymaps/keymap_tiny.c **** 
+  98:keymaps/keymap_tiny.c **** 	/* Keymap 3: Fn1 Layer
+  99:keymaps/keymap_tiny.c **** 	 * ,-----------------------------------------------------------.
+ 100:keymaps/keymap_tiny.c **** 	 * | | | | | | | | | | | | | | |
+ 101:keymaps/keymap_tiny.c **** 	 * |-----------------------------------------------------------|
+ 102:keymaps/keymap_tiny.c **** 	 * | | |Up | | | | | | | | |BL-|BL+|BL |
+ 103:keymaps/keymap_tiny.c **** 	 * |-----------------------------------------------------------|
+ 104:keymaps/keymap_tiny.c **** 	 * | |Lef|Dow|Rig| |Hom|Lef|Dow|Up |Rig|End| | |
+ 105:keymaps/keymap_tiny.c **** 	 * |-----------------------------------------------------------|
+ 106:keymaps/keymap_tiny.c **** 	 * | | F1|F2 | F3|F4 | F5| F6| F7| F8| | |Up |
+ 107:keymaps/keymap_tiny.c **** 	 * |-----------------------------------------------------------|
+ 108:keymaps/keymap_tiny.c **** 	 * | | | | FN9 | |Left|Down|Rig |
+ 109:keymaps/keymap_tiny.c **** 	 * `-----------------------------------------------------------'
+ 110:keymaps/keymap_tiny.c **** 	 */
+ 111:keymaps/keymap_tiny.c **** 	[_MV] = KEYMAP(
+ 112:keymaps/keymap_tiny.c **** 		KC_NO,										 KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,	KC_NO,	 KC_NO,	 KC_NO, KC_NO, KC_NO, K
+ 113:keymaps/keymap_tiny.c **** 		KC_NO,										 KC_NO, KC_UP, KC_NO, KC_NO, KC_NO, KC_NO,	KC_NO,	 KC_NO,	 KC_NO, KC_NO, KC_NO, K
+ 114:keymaps/keymap_tiny.c **** 		KC_NO,										 KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,	KC_NO,	 KC_NO,	 KC_NO, KC_NO, KC_NO, K
+ 115:keymaps/keymap_tiny.c **** 		KC_NO,										 F( 1 ), F( 2 ), F( 3 ), F( 4 ), F( 5 ), F( 6 ),	F( 7 ),	 F( 8 ), F( 9 ), KC_NO, 
+ 116:keymaps/keymap_tiny.c **** 		KC_NO,										 KC_NO, KC_NO, KC_NO, KC_TRNS, KC_NO, KC_NO,	KC_NO ),
+ 117:keymaps/keymap_tiny.c **** };
+ 118:keymaps/keymap_tiny.c **** 
+ 119:keymaps/keymap_tiny.c **** enum function_id {
+ 120:keymaps/keymap_tiny.c **** 	SHIFT_ESC,
+ 121:keymaps/keymap_tiny.c **** 	RGBLED_TOGGLE,
+ 122:keymaps/keymap_tiny.c **** 	RGBLED_STEP_MODE,
+ 123:keymaps/keymap_tiny.c **** 	RGBLED_PRE_MODE,
+ 124:keymaps/keymap_tiny.c **** 	RGBLED_INCREASE_HUE,
+ 125:keymaps/keymap_tiny.c **** 	RGBLED_DECREASE_HUE,
+ 126:keymaps/keymap_tiny.c **** 	RGBLED_INCREASE_SAT,
+ 127:keymaps/keymap_tiny.c **** 	RGBLED_DECREASE_SAT,
+ 128:keymaps/keymap_tiny.c **** 	RGBLED_INCREASE_VAL,
+ 129:keymaps/keymap_tiny.c **** 	RGBLED_DECREASE_VAL,
+ 130:keymaps/keymap_tiny.c **** };
+ 131:keymaps/keymap_tiny.c **** 
+ 132:keymaps/keymap_tiny.c **** const uint16_t PROGMEM fn_actions[] = {
+ 133:keymaps/keymap_tiny.c **** 	[0] = ACTION_FUNCTION( SHIFT_ESC ),
+ 134:keymaps/keymap_tiny.c **** 	/* rgb */
+ 135:keymaps/keymap_tiny.c **** 	[1]	= ACTION_FUNCTION( RGBLED_TOGGLE ),
+ 136:keymaps/keymap_tiny.c **** 	[2]	= ACTION_FUNCTION( RGBLED_STEP_MODE ),
+ 137:keymaps/keymap_tiny.c **** 	[3]	= ACTION_FUNCTION( RGBLED_PRE_MODE ),
+ 138:keymaps/keymap_tiny.c **** 	[4]	= ACTION_FUNCTION( RGBLED_INCREASE_HUE ),
+ 139:keymaps/keymap_tiny.c **** 	[5]	= ACTION_FUNCTION( RGBLED_DECREASE_HUE ),
+ 140:keymaps/keymap_tiny.c **** 	[6]	= ACTION_FUNCTION( RGBLED_INCREASE_SAT ),
+ 141:keymaps/keymap_tiny.c **** 	[7]	= ACTION_FUNCTION( RGBLED_DECREASE_SAT ),
+ 142:keymaps/keymap_tiny.c **** 	/* backlight */
+ 143:keymaps/keymap_tiny.c **** 	[8] = ACTION_BACKLIGHT_DECREASE(),
+ 144:keymaps/keymap_tiny.c **** 	[9] = ACTION_BACKLIGHT_INCREASE(),
+ 145:keymaps/keymap_tiny.c **** 	/* layout */
+ 146:keymaps/keymap_tiny.c **** 	[10]	= ACTION_LAYER_MOMENTARY( _MV ),
+ 147:keymaps/keymap_tiny.c **** 	[11] = ACTION_LAYER_MOMENTARY( _FL ),
+ 148:keymaps/keymap_tiny.c **** 	[12]	= ACTION_MACRO( _EMAIL ),
+ 149:keymaps/keymap_tiny.c **** };
+ 150:keymaps/keymap_tiny.c **** 
+ 151:keymaps/keymap_tiny.c **** #define MODS_CTRL_MASK (MOD_BIT( KC_LSHIFT ) | MOD_BIT( KC_RSHIFT ) )
+ 152:keymaps/keymap_tiny.c **** 
+ 153:keymaps/keymap_tiny.c **** void action_function( keyrecord_t *record, uint8_t id, uint8_t opt )
+ 154:keymaps/keymap_tiny.c **** {
+  16               		.loc 1 154 0
+  17               		.cfi_startproc
+  18               	.LVL0:
+  19 0000 CF93      		push r28
+  20               	.LCFI0:
+  21               		.cfi_def_cfa_offset 3
+  22               		.cfi_offset 28, -2
+  23 0002 DF93      		push r29
+  24               	.LCFI1:
+  25               		.cfi_def_cfa_offset 4
+  26               		.cfi_offset 29, -3
+  27               	/* prologue: function */
+  28               	/* frame size = 0 */
+  29               	/* stack size = 2 */
+  30               	.L__stack_usage = 2
+  31 0004 EC01      		movw r28,r24
+ 155:keymaps/keymap_tiny.c **** 	static uint8_t shift_esc_shift_mask;
+ 156:keymaps/keymap_tiny.c **** 	switch ( id )
+  32               		.loc 1 156 0
+  33 0006 6430      		cpi r22,lo8(4)
+  34 0008 01F4      		brne .+2
+  35 000a 00C0      		rjmp .L7
+  36 000c 00F4      		brsh .L13
+  37 000e 6130      		cpi r22,lo8(1)
+  38 0010 01F0      		breq .L4
+  39 0012 00F0      		brlo .L3
+  40 0014 6230      		cpi r22,lo8(2)
+  41 0016 01F4      		brne .+2
+  42 0018 00C0      		rjmp .L5
+  43 001a 6330      		cpi r22,lo8(3)
+  44 001c 01F0      		breq .+2
+  45 001e 00C0      		rjmp .L1
+  46 0020 00C0      		rjmp .L6
+  47               	.L13:
+  48 0022 6730      		cpi r22,lo8(7)
+  49 0024 01F4      		brne .+2
+  50 0026 00C0      		rjmp .L10
+  51 0028 00F4      		brsh .L14
+  52 002a 6530      		cpi r22,lo8(5)
+  53 002c 01F0      		breq .L8
+  54 002e 6630      		cpi r22,lo8(6)
+  55 0030 01F0      		breq .+2
+  56 0032 00C0      		rjmp .L1
+  57 0034 00C0      		rjmp .L9
+  58               	.L14:
+  59 0036 6830      		cpi r22,lo8(8)
+  60 0038 01F4      		brne .+2
+  61 003a 00C0      		rjmp .L11
+  62 003c 6930      		cpi r22,lo8(9)
+  63 003e 01F0      		breq .+2
+  64 0040 00C0      		rjmp .L1
+  65 0042 00C0      		rjmp .L12
+  66               	.L3:
+  67               	.LBB2:
+ 157:keymaps/keymap_tiny.c **** 	{
+ 158:keymaps/keymap_tiny.c **** 	case SHIFT_ESC:
+ 159:keymaps/keymap_tiny.c **** 		shift_esc_shift_mask = get_mods() & MODS_CTRL_MASK;
+  68               		.loc 1 159 0
+  69 0044 0E94 0000 		call get_mods
+  70               	.LVL1:
+  71 0048 8272      		andi r24,34
+  72 004a 9927      		clr r25
+  73 004c 982F      		mov r25,r24
+  74 004e 8093 0000 		sts shift_esc_shift_mask.4661,r24
+ 160:keymaps/keymap_tiny.c **** 		if ( record->event.pressed)
+  75               		.loc 1 160 0
+  76 0052 8A81      		ldd r24,Y+2
+  77 0054 8823      		tst r24
+  78 0056 01F0      		breq .L15
+ 161:keymaps/keymap_tiny.c **** 		{
+ 162:keymaps/keymap_tiny.c **** 			if ( shift_esc_shift_mask )
+  79               		.loc 1 162 0
+  80 0058 9923      		tst r25
+  81 005a 01F0      		breq .L16
+  82               	.LBB3:
+ 163:keymaps/keymap_tiny.c **** 			{
+ 164:keymaps/keymap_tiny.c **** 				add_key( KC_GRV );
+  83               		.loc 1 164 0
+  84 005c 85E3      		ldi r24,lo8(53)
+  85 005e 90E0      		ldi r25,0
+  86 0060 00C0      		rjmp .L45
+  87               	.L16:
+  88               	.LBE3:
+  89               	.LBB4:
+ 165:keymaps/keymap_tiny.c **** 				send_keyboard_report();
+ 166:keymaps/keymap_tiny.c **** 			} else {
+ 167:keymaps/keymap_tiny.c **** 				add_key( KC_ESC );
+  90               		.loc 1 167 0
+  91 0062 89E2      		ldi r24,lo8(41)
+  92 0064 90E0      		ldi r25,0
+  93               	.L45:
+  94 0066 0E94 0000 		call add_key
+  95               	.LVL2:
+  96               	.L46:
+  97               	/* epilogue start */
+  98               	.LBE4:
+  99               	.LBE2:
+ 168:keymaps/keymap_tiny.c **** 				send_keyboard_report();
+ 169:keymaps/keymap_tiny.c **** 			}
+ 170:keymaps/keymap_tiny.c **** 		} else {
+ 171:keymaps/keymap_tiny.c **** 			if ( shift_esc_shift_mask )
+ 172:keymaps/keymap_tiny.c **** 			{
+ 173:keymaps/keymap_tiny.c **** 				del_key( KC_GRV );
+ 174:keymaps/keymap_tiny.c **** 				send_keyboard_report();
+ 175:keymaps/keymap_tiny.c **** 			} else {
+ 176:keymaps/keymap_tiny.c **** 				del_key( KC_ESC );
+ 177:keymaps/keymap_tiny.c **** 				send_keyboard_report();
+ 178:keymaps/keymap_tiny.c **** 			}
+ 179:keymaps/keymap_tiny.c **** 		}
+ 180:keymaps/keymap_tiny.c **** 		break;
+ 181:keymaps/keymap_tiny.c **** 	case RGBLED_TOGGLE:
+ 182:keymaps/keymap_tiny.c **** 		/* led operations */
+ 183:keymaps/keymap_tiny.c **** 		if ( record->event.pressed )
+ 184:keymaps/keymap_tiny.c **** 		{
+ 185:keymaps/keymap_tiny.c **** 			rgblight_toggle();
+ 186:keymaps/keymap_tiny.c **** 		}
+ 187:keymaps/keymap_tiny.c **** 
+ 188:keymaps/keymap_tiny.c **** 		break;
+ 189:keymaps/keymap_tiny.c **** 	case RGBLED_INCREASE_HUE:
+ 190:keymaps/keymap_tiny.c **** 		if ( record->event.pressed )
+ 191:keymaps/keymap_tiny.c **** 		{
+ 192:keymaps/keymap_tiny.c **** 			rgblight_increase_hue();
+ 193:keymaps/keymap_tiny.c **** 		}
+ 194:keymaps/keymap_tiny.c **** 		break;
+ 195:keymaps/keymap_tiny.c **** 	case RGBLED_DECREASE_HUE:
+ 196:keymaps/keymap_tiny.c **** 		if ( record->event.pressed )
+ 197:keymaps/keymap_tiny.c **** 		{
+ 198:keymaps/keymap_tiny.c **** 			rgblight_decrease_hue();
+ 199:keymaps/keymap_tiny.c **** 		}
+ 200:keymaps/keymap_tiny.c **** 		break;
+ 201:keymaps/keymap_tiny.c **** 	case RGBLED_INCREASE_SAT:
+ 202:keymaps/keymap_tiny.c **** 		if ( record->event.pressed )
+ 203:keymaps/keymap_tiny.c **** 		{
+ 204:keymaps/keymap_tiny.c **** 			rgblight_increase_sat();
+ 205:keymaps/keymap_tiny.c **** 		}
+ 206:keymaps/keymap_tiny.c **** 		break;
+ 207:keymaps/keymap_tiny.c **** 	case RGBLED_DECREASE_SAT:
+ 208:keymaps/keymap_tiny.c **** 		if ( record->event.pressed )
+ 209:keymaps/keymap_tiny.c **** 		{
+ 210:keymaps/keymap_tiny.c **** 			rgblight_decrease_sat();
+ 211:keymaps/keymap_tiny.c **** 		}
+ 212:keymaps/keymap_tiny.c **** 		break;
+ 213:keymaps/keymap_tiny.c **** 	case RGBLED_INCREASE_VAL:
+ 214:keymaps/keymap_tiny.c **** 		if ( record->event.pressed )
+ 215:keymaps/keymap_tiny.c **** 		{
+ 216:keymaps/keymap_tiny.c **** 			rgblight_increase_val();
+ 217:keymaps/keymap_tiny.c **** 		}
+ 218:keymaps/keymap_tiny.c **** 		break;
+ 219:keymaps/keymap_tiny.c **** 	case RGBLED_DECREASE_VAL:
+ 220:keymaps/keymap_tiny.c **** 		if ( record->event.pressed )
+ 221:keymaps/keymap_tiny.c **** 		{
+ 222:keymaps/keymap_tiny.c **** 			rgblight_decrease_val();
+ 223:keymaps/keymap_tiny.c **** 		}
+ 224:keymaps/keymap_tiny.c **** 		break;
+ 225:keymaps/keymap_tiny.c **** 	case RGBLED_STEP_MODE:
+ 226:keymaps/keymap_tiny.c **** 		if ( record->event.pressed )
+ 227:keymaps/keymap_tiny.c **** 		{
+ 228:keymaps/keymap_tiny.c **** 			rgblight_step();
+ 229:keymaps/keymap_tiny.c **** 		}
+ 230:keymaps/keymap_tiny.c **** 		break;
+ 231:keymaps/keymap_tiny.c **** 	case RGBLED_PRE_MODE:
+ 232:keymaps/keymap_tiny.c **** 	if ( record->event.pressed ){
+ 233:keymaps/keymap_tiny.c **** 		rgblight_pre();
+ 234:keymaps/keymap_tiny.c **** 	}
+ 235:keymaps/keymap_tiny.c **** 		break;
+ 236:keymaps/keymap_tiny.c **** 	}
+ 237:keymaps/keymap_tiny.c **** }
+ 100               		.loc 1 237 0
+ 101 006a DF91      		pop r29
+ 102 006c CF91      		pop r28
+ 103               	.LVL3:
+ 104               	.LBB8:
+ 105               	.LBB5:
+ 168:keymaps/keymap_tiny.c **** 				send_keyboard_report();
+ 106               		.loc 1 168 0
+ 107 006e 0C94 0000 		jmp send_keyboard_report
+ 108               	.LVL4:
+ 109               	.L15:
+ 110               	.LBE5:
+ 171:keymaps/keymap_tiny.c **** 			if ( shift_esc_shift_mask )
+ 111               		.loc 1 171 0
+ 112 0072 9923      		tst r25
+ 113 0074 01F0      		breq .L17
+ 114               	.LBB6:
+ 173:keymaps/keymap_tiny.c **** 				del_key( KC_GRV );
+ 115               		.loc 1 173 0
+ 116 0076 85E3      		ldi r24,lo8(53)
+ 117 0078 90E0      		ldi r25,0
+ 118 007a 00C0      		rjmp .L47
+ 119               	.L17:
+ 120               	.LBE6:
+ 121               	.LBB7:
+ 176:keymaps/keymap_tiny.c **** 				del_key( KC_ESC );
+ 122               		.loc 1 176 0
+ 123 007c 89E2      		ldi r24,lo8(41)
+ 124 007e 90E0      		ldi r25,0
+ 125               	.L47:
+ 126 0080 0E94 0000 		call del_key
+ 127               	.LVL5:
+ 128 0084 00C0      		rjmp .L46
+ 129               	.LVL6:
+ 130               	.L4:
+ 131               	.LBE7:
+ 183:keymaps/keymap_tiny.c **** 		if ( record->event.pressed )
+ 132               		.loc 1 183 0
+ 133 0086 8A81      		ldd r24,Y+2
+ 134               	.LVL7:
+ 135 0088 8823      		tst r24
+ 136 008a 01F0      		breq .L1
+ 137               	/* epilogue start */
+ 138               	.LBE8:
+ 139               		.loc 1 237 0
+ 140 008c DF91      		pop r29
+ 141 008e CF91      		pop r28
+ 142               	.LVL8:
+ 143               	.LBB9:
+ 185:keymaps/keymap_tiny.c **** 			rgblight_toggle();
+ 144               		.loc 1 185 0
+ 145 0090 0C94 0000 		jmp rgblight_toggle
+ 146               	.LVL9:
+ 147               	.L7:
+ 190:keymaps/keymap_tiny.c **** 		if ( record->event.pressed )
+ 148               		.loc 1 190 0
+ 149 0094 8A81      		ldd r24,Y+2
+ 150               	.LVL10:
+ 151 0096 8823      		tst r24
+ 152 0098 01F0      		breq .L1
+ 153               	/* epilogue start */
+ 154               	.LBE9:
+ 155               		.loc 1 237 0
+ 156 009a DF91      		pop r29
+ 157 009c CF91      		pop r28
+ 158               	.LVL11:
+ 159               	.LBB10:
+ 192:keymaps/keymap_tiny.c **** 			rgblight_increase_hue();
+ 160               		.loc 1 192 0
+ 161 009e 0C94 0000 		jmp rgblight_increase_hue
+ 162               	.LVL12:
+ 163               	.L8:
+ 196:keymaps/keymap_tiny.c **** 		if ( record->event.pressed )
+ 164               		.loc 1 196 0
+ 165 00a2 8A81      		ldd r24,Y+2
+ 166               	.LVL13:
+ 167 00a4 8823      		tst r24
+ 168 00a6 01F0      		breq .L1
+ 169               	/* epilogue start */
+ 170               	.LBE10:
+ 171               		.loc 1 237 0
+ 172 00a8 DF91      		pop r29
+ 173 00aa CF91      		pop r28
+ 174               	.LVL14:
+ 175               	.LBB11:
+ 198:keymaps/keymap_tiny.c **** 			rgblight_decrease_hue();
+ 176               		.loc 1 198 0
+ 177 00ac 0C94 0000 		jmp rgblight_decrease_hue
+ 178               	.LVL15:
+ 179               	.L9:
+ 202:keymaps/keymap_tiny.c **** 		if ( record->event.pressed )
+ 180               		.loc 1 202 0
+ 181 00b0 8A81      		ldd r24,Y+2
+ 182               	.LVL16:
+ 183 00b2 8823      		tst r24
+ 184 00b4 01F0      		breq .L1
+ 185               	/* epilogue start */
+ 186               	.LBE11:
+ 187               		.loc 1 237 0
+ 188 00b6 DF91      		pop r29
+ 189 00b8 CF91      		pop r28
+ 190               	.LVL17:
+ 191               	.LBB12:
+ 204:keymaps/keymap_tiny.c **** 			rgblight_increase_sat();
+ 192               		.loc 1 204 0
+ 193 00ba 0C94 0000 		jmp rgblight_increase_sat
+ 194               	.LVL18:
+ 195               	.L10:
+ 208:keymaps/keymap_tiny.c **** 		if ( record->event.pressed )
+ 196               		.loc 1 208 0
+ 197 00be 8A81      		ldd r24,Y+2
+ 198               	.LVL19:
+ 199 00c0 8823      		tst r24
+ 200 00c2 01F0      		breq .L1
+ 201               	/* epilogue start */
+ 202               	.LBE12:
+ 203               		.loc 1 237 0
+ 204 00c4 DF91      		pop r29
+ 205 00c6 CF91      		pop r28
+ 206               	.LVL20:
+ 207               	.LBB13:
+ 210:keymaps/keymap_tiny.c **** 			rgblight_decrease_sat();
+ 208               		.loc 1 210 0
+ 209 00c8 0C94 0000 		jmp rgblight_decrease_sat
+ 210               	.LVL21:
+ 211               	.L11:
+ 214:keymaps/keymap_tiny.c **** 		if ( record->event.pressed )
+ 212               		.loc 1 214 0
+ 213 00cc 8A81      		ldd r24,Y+2
+ 214               	.LVL22:
+ 215 00ce 8823      		tst r24
+ 216 00d0 01F0      		breq .L1
+ 217               	/* epilogue start */
+ 218               	.LBE13:
+ 219               		.loc 1 237 0
+ 220 00d2 DF91      		pop r29
+ 221 00d4 CF91      		pop r28
+ 222               	.LVL23:
+ 223               	.LBB14:
+ 216:keymaps/keymap_tiny.c **** 			rgblight_increase_val();
+ 224               		.loc 1 216 0
+ 225 00d6 0C94 0000 		jmp rgblight_increase_val
+ 226               	.LVL24:
+ 227               	.L12:
+ 220:keymaps/keymap_tiny.c **** 		if ( record->event.pressed )
+ 228               		.loc 1 220 0
+ 229 00da 8A81      		ldd r24,Y+2
+ 230               	.LVL25:
+ 231 00dc 8823      		tst r24
+ 232 00de 01F0      		breq .L1
+ 233               	/* epilogue start */
+ 234               	.LBE14:
+ 235               		.loc 1 237 0
+ 236 00e0 DF91      		pop r29
+ 237 00e2 CF91      		pop r28
+ 238               	.LVL26:
+ 239               	.LBB15:
+ 222:keymaps/keymap_tiny.c **** 			rgblight_decrease_val();
+ 240               		.loc 1 222 0
+ 241 00e4 0C94 0000 		jmp rgblight_decrease_val
+ 242               	.LVL27:
+ 243               	.L5:
+ 226:keymaps/keymap_tiny.c **** 		if ( record->event.pressed )
+ 244               		.loc 1 226 0
+ 245 00e8 8A81      		ldd r24,Y+2
+ 246               	.LVL28:
+ 247 00ea 8823      		tst r24
+ 248 00ec 01F0      		breq .L1
+ 249               	/* epilogue start */
+ 250               	.LBE15:
+ 251               		.loc 1 237 0
+ 252 00ee DF91      		pop r29
+ 253 00f0 CF91      		pop r28
+ 254               	.LVL29:
+ 255               	.LBB16:
+ 228:keymaps/keymap_tiny.c **** 			rgblight_step();
+ 256               		.loc 1 228 0
+ 257 00f2 0C94 0000 		jmp rgblight_step
+ 258               	.LVL30:
+ 259               	.L6:
+ 232:keymaps/keymap_tiny.c **** 	if ( record->event.pressed ){
+ 260               		.loc 1 232 0
+ 261 00f6 8A81      		ldd r24,Y+2
+ 262               	.LVL31:
+ 263 00f8 8823      		tst r24
+ 264 00fa 01F0      		breq .L1
+ 265               	/* epilogue start */
+ 266               	.LBE16:
+ 267               		.loc 1 237 0
+ 268 00fc DF91      		pop r29
+ 269 00fe CF91      		pop r28
+ 270               	.LVL32:
+ 271               	.LBB17:
+ 233:keymaps/keymap_tiny.c **** 		rgblight_pre();
+ 272               		.loc 1 233 0
+ 273 0100 0C94 0000 		jmp rgblight_pre
+ 274               	.LVL33:
+ 275               	.L1:
+ 276               	/* epilogue start */
+ 277               	.LBE17:
+ 278               		.loc 1 237 0
+ 279 0104 DF91      		pop r29
+ 280 0106 CF91      		pop r28
+ 281               	.LVL34:
+ 282 0108 0895      		ret
+ 283               		.cfi_endproc
+ 284               	.LFE103:
+ 286               		.section	.text.action_get_macro,"ax",@progbits
+ 287               	.global	action_get_macro
+ 289               	action_get_macro:
+ 290               	.LFB104:
+ 238:keymaps/keymap_tiny.c **** 
+ 239:keymaps/keymap_tiny.c **** 
+ 240:keymaps/keymap_tiny.c **** const macro_t *action_get_macro( keyrecord_t *record, uint8_t id, uint8_t opt )
+ 241:keymaps/keymap_tiny.c **** {
+ 291               		.loc 1 241 0
+ 292               		.cfi_startproc
+ 293               	.LVL35:
+ 294               	/* prologue: function */
+ 295               	/* frame size = 0 */
+ 296               	/* stack size = 0 */
+ 297               	.L__stack_usage = 0
+ 242:keymaps/keymap_tiny.c **** 	switch ( id )
+ 298               		.loc 1 242 0
+ 299 0000 6111      		cpse r22,__zero_reg__
+ 300 0002 00C0      		rjmp .L53
+ 243:keymaps/keymap_tiny.c **** 	{
+ 244:keymaps/keymap_tiny.c **** 	case _EMAIL:
+ 245:keymaps/keymap_tiny.c **** 		/*
+ 246:keymaps/keymap_tiny.c **** 		 * return(record->event.pressed ? MACRO( D( LSFT ), T( 1 )T, U( LSFT ), T(
+ 247:keymaps/keymap_tiny.c **** 		 * 3 ), T( 6 ), T( 6 ), T( O ), END ) : MACRO( END ) );
+ 248:keymaps/keymap_tiny.c **** 		 */
+ 249:keymaps/keymap_tiny.c **** 		return(record->event.pressed
+ 250:keymaps/keymap_tiny.c **** 		 ? MACRO( T( 1 ), T( 3 ), T( 6 ), T( 6 ), T( 2 ), T( 5 ), T( 2 ), T( 1 ), T( 4 ),
+ 251:keymaps/keymap_tiny.c **** 				D( LSFT ), T( 2 ), U( LSFT ), T( Q ), T( Q ), T( DOT ), T( C ),
+ 252:keymaps/keymap_tiny.c **** 				T( O ), T( M ), END )
+ 253:keymaps/keymap_tiny.c **** 		 : MACRO( END ) );
+ 301               		.loc 1 253 0
+ 302 0004 FC01      		movw r30,r24
+ 303 0006 8281      		ldd r24,Z+2
+ 304               	.LVL36:
+ 305 0008 8823      		tst r24
+ 306 000a 01F0      		breq .L52
+ 307 000c 20E0      		ldi r18,lo8(__m.4692)
+ 308 000e 30E0      		ldi r19,hi8(__m.4692)
+ 309 0010 00C0      		rjmp .L49
+ 310               	.LVL37:
+ 311               	.L53:
+ 254:keymaps/keymap_tiny.c **** 		break;
+ 255:keymaps/keymap_tiny.c **** 	}
+ 256:keymaps/keymap_tiny.c **** 
+ 257:keymaps/keymap_tiny.c **** 	return(MACRO_NONE);
+ 312               		.loc 1 257 0
+ 313 0012 20E0      		ldi r18,0
+ 314 0014 30E0      		ldi r19,0
+ 315 0016 00C0      		rjmp .L49
+ 316               	.LVL38:
+ 317               	.L52:
+ 253:keymaps/keymap_tiny.c **** 		 : MACRO( END ) );
+ 318               		.loc 1 253 0
+ 319 0018 20E0      		ldi r18,lo8(__m.4694)
+ 320 001a 30E0      		ldi r19,hi8(__m.4694)
+ 321               	.LVL39:
+ 322               	.L49:
+ 258:keymaps/keymap_tiny.c **** };
+ 323               		.loc 1 258 0
+ 324 001c C901      		movw r24,r18
+ 325 001e 0895      		ret
+ 326               		.cfi_endproc
+ 327               	.LFE104:
+ 329               	.global	fn_actions
+ 330               		.section	.progmem.data.fn_actions,"a",@progbits
+ 333               	fn_actions:
+ 334 0000 00F0      		.word	-4096
+ 335 0002 01F0      		.word	-4095
+ 336 0004 02F0      		.word	-4094
+ 337 0006 03F0      		.word	-4093
+ 338 0008 04F0      		.word	-4092
+ 339 000a 05F0      		.word	-4091
+ 340 000c 06F0      		.word	-4090
+ 341 000e 07F0      		.word	-4089
+ 342 0010 00D1      		.word	-12032
+ 343 0012 00D0      		.word	-12288
+ 344 0014 F1A3      		.word	-23567
+ 345 0016 F1A2      		.word	-23823
+ 346 0018 00C0      		.word	-16384
+ 347               	.global	keymaps
+ 348               		.section	.progmem.data.keymaps,"a",@progbits
+ 351               	keymaps:
+ 352 0000 0020      		.word	8192
+ 353 0002 1E00      		.word	30
+ 354 0004 1F00      		.word	31
+ 355 0006 2000      		.word	32
+ 356 0008 2100      		.word	33
+ 357 000a 2200      		.word	34
+ 358 000c 2300      		.word	35
+ 359 000e 2400      		.word	36
+ 360 0010 2500      		.word	37
+ 361 0012 2600      		.word	38
+ 362 0014 2700      		.word	39
+ 363 0016 2D00      		.word	45
+ 364 0018 2E00      		.word	46
+ 365 001a 2A00      		.word	42
+ 366 001c 2B00      		.word	43
+ 367 001e 1400      		.word	20
+ 368 0020 1A00      		.word	26
+ 369 0022 0800      		.word	8
+ 370 0024 1500      		.word	21
+ 371 0026 1700      		.word	23
+ 372 0028 1C00      		.word	28
+ 373 002a 1800      		.word	24
+ 374 002c 0C00      		.word	12
+ 375 002e 1200      		.word	18
+ 376 0030 1300      		.word	19
+ 377 0032 2F00      		.word	47
+ 378 0034 3000      		.word	48
+ 379 0036 3100      		.word	49
+ 380 0038 3900      		.word	57
+ 381 003a 0400      		.word	4
+ 382 003c 1600      		.word	22
+ 383 003e 0700      		.word	7
+ 384 0040 0900      		.word	9
+ 385 0042 0A00      		.word	10
+ 386 0044 0B00      		.word	11
+ 387 0046 0D00      		.word	13
+ 388 0048 0E00      		.word	14
+ 389 004a 0F00      		.word	15
+ 390 004c 3300      		.word	51
+ 391 004e 3400      		.word	52
+ 392 0050 0000      		.word	0
+ 393 0052 2800      		.word	40
+ 394 0054 E100      		.word	225
+ 395 0056 0000      		.word	0
+ 396 0058 1D00      		.word	29
+ 397 005a 1B00      		.word	27
+ 398 005c 0600      		.word	6
+ 399 005e 1900      		.word	25
+ 400 0060 0500      		.word	5
+ 401 0062 1100      		.word	17
+ 402 0064 1000      		.word	16
+ 403 0066 3600      		.word	54
+ 404 0068 3700      		.word	55
+ 405 006a 3800      		.word	56
+ 406 006c 0000      		.word	0
+ 407 006e E100      		.word	225
+ 408 0070 E000      		.word	224
+ 409 0072 E300      		.word	227
+ 410 0074 E200      		.word	226
+ 411 0076 0000      		.word	0
+ 412 0078 0000      		.word	0
+ 413 007a 2C00      		.word	44
+ 414 007c 0000      		.word	0
+ 415 007e 0000      		.word	0
+ 416 0080 0000      		.word	0
+ 417 0082 0000      		.word	0
+ 418 0084 0A20      		.word	8202
+ 419 0086 5000      		.word	80
+ 420 0088 0B20      		.word	8203
+ 421 008a 4F00      		.word	79
+ 422 008c 0020      		.word	8192
+ 423 008e 1E00      		.word	30
+ 424 0090 1F00      		.word	31
+ 425 0092 2000      		.word	32
+ 426 0094 2100      		.word	33
+ 427 0096 2200      		.word	34
+ 428 0098 2300      		.word	35
+ 429 009a 2400      		.word	36
+ 430 009c 2500      		.word	37
+ 431 009e 2600      		.word	38
+ 432 00a0 2700      		.word	39
+ 433 00a2 2D00      		.word	45
+ 434 00a4 2E00      		.word	46
+ 435 00a6 2A00      		.word	42
+ 436 00a8 2B00      		.word	43
+ 437 00aa 1400      		.word	20
+ 438 00ac 1A00      		.word	26
+ 439 00ae 0800      		.word	8
+ 440 00b0 1500      		.word	21
+ 441 00b2 1700      		.word	23
+ 442 00b4 1C00      		.word	28
+ 443 00b6 1800      		.word	24
+ 444 00b8 0C00      		.word	12
+ 445 00ba 1200      		.word	18
+ 446 00bc 1300      		.word	19
+ 447 00be 2F00      		.word	47
+ 448 00c0 3000      		.word	48
+ 449 00c2 3100      		.word	49
+ 450 00c4 0B20      		.word	8203
+ 451 00c6 0400      		.word	4
+ 452 00c8 1600      		.word	22
+ 453 00ca 0700      		.word	7
+ 454 00cc 0900      		.word	9
+ 455 00ce 0A00      		.word	10
+ 456 00d0 0B00      		.word	11
+ 457 00d2 0D00      		.word	13
+ 458 00d4 0E00      		.word	14
+ 459 00d6 0F00      		.word	15
+ 460 00d8 3300      		.word	51
+ 461 00da 3400      		.word	52
+ 462 00dc 0000      		.word	0
+ 463 00de 2800      		.word	40
+ 464 00e0 E100      		.word	225
+ 465 00e2 0000      		.word	0
+ 466 00e4 1D00      		.word	29
+ 467 00e6 1B00      		.word	27
+ 468 00e8 0600      		.word	6
+ 469 00ea 1900      		.word	25
+ 470 00ec 0500      		.word	5
+ 471 00ee 1100      		.word	17
+ 472 00f0 1000      		.word	16
+ 473 00f2 3600      		.word	54
+ 474 00f4 3700      		.word	55
+ 475 00f6 3800      		.word	56
+ 476 00f8 0000      		.word	0
+ 477 00fa E500      		.word	229
+ 478 00fc E000      		.word	224
+ 479 00fe E200      		.word	226
+ 480 0100 E300      		.word	227
+ 481 0102 0000      		.word	0
+ 482 0104 0000      		.word	0
+ 483 0106 2C00      		.word	44
+ 484 0108 0000      		.word	0
+ 485 010a 0000      		.word	0
+ 486 010c 0000      		.word	0
+ 487 010e 0000      		.word	0
+ 488 0110 E700      		.word	231
+ 489 0112 E600      		.word	230
+ 490 0114 E400      		.word	228
+ 491 0116 0920      		.word	8201
+ 492 0118 3500      		.word	53
+ 493 011a 3A00      		.word	58
+ 494 011c 3B00      		.word	59
+ 495 011e 3C00      		.word	60
+ 496 0120 3D00      		.word	61
+ 497 0122 3E00      		.word	62
+ 498 0124 3F00      		.word	63
+ 499 0126 4000      		.word	64
+ 500 0128 4100      		.word	65
+ 501 012a 4200      		.word	66
+ 502 012c 4300      		.word	67
+ 503 012e 4400      		.word	68
+ 504 0130 4500      		.word	69
+ 505 0132 4C00      		.word	76
+ 506 0134 0100      		.word	1
+ 507 0136 0C20      		.word	8204
+ 508 0138 5200      		.word	82
+ 509 013a 0D20      		.word	8205
+ 510 013c 0100      		.word	1
+ 511 013e 4900      		.word	73
+ 512 0140 0100      		.word	1
+ 513 0142 0100      		.word	1
+ 514 0144 0100      		.word	1
+ 515 0146 0100      		.word	1
+ 516 0148 0100      		.word	1
+ 517 014a 0100      		.word	1
+ 518 014c 0100      		.word	1
+ 519 014e 0100      		.word	1
+ 520 0150 0100      		.word	1
+ 521 0152 5000      		.word	80
+ 522 0154 5100      		.word	81
+ 523 0156 4F00      		.word	79
+ 524 0158 0100      		.word	1
+ 525 015a 4A00      		.word	74
+ 526 015c 5000      		.word	80
+ 527 015e 5100      		.word	81
+ 528 0160 5200      		.word	82
+ 529 0162 4F00      		.word	79
+ 530 0164 4A00      		.word	74
+ 531 0166 0100      		.word	1
+ 532 0168 0000      		.word	0
+ 533 016a 0100      		.word	1
+ 534 016c 0100      		.word	1
+ 535 016e 0000      		.word	0
+ 536 0170 AA00      		.word	170
+ 537 0172 A900      		.word	169
+ 538 0174 0100      		.word	1
+ 539 0176 0100      		.word	1
+ 540 0178 0100      		.word	1
+ 541 017a 0100      		.word	1
+ 542 017c 0100      		.word	1
+ 543 017e 0100      		.word	1
+ 544 0180 0100      		.word	1
+ 545 0182 4D00      		.word	77
+ 546 0184 0000      		.word	0
+ 547 0186 5200      		.word	82
+ 548 0188 AC00      		.word	172
+ 549 018a AE00      		.word	174
+ 550 018c AB00      		.word	171
+ 551 018e 0000      		.word	0
+ 552 0190 0000      		.word	0
+ 553 0192 0100      		.word	1
+ 554 0194 0000      		.word	0
+ 555 0196 0000      		.word	0
+ 556 0198 0000      		.word	0
+ 557 019a 0000      		.word	0
+ 558 019c 5100      		.word	81
+ 559 019e 5000      		.word	80
+ 560 01a0 0100      		.word	1
+ 561 01a2 4F00      		.word	79
+ 562 01a4 0000      		.word	0
+ 563 01a6 0000      		.word	0
+ 564 01a8 0000      		.word	0
+ 565 01aa 0000      		.word	0
+ 566 01ac 0000      		.word	0
+ 567 01ae 0000      		.word	0
+ 568 01b0 0000      		.word	0
+ 569 01b2 0000      		.word	0
+ 570 01b4 0000      		.word	0
+ 571 01b6 0000      		.word	0
+ 572 01b8 0000      		.word	0
+ 573 01ba 0000      		.word	0
+ 574 01bc 0000      		.word	0
+ 575 01be 0000      		.word	0
+ 576 01c0 0000      		.word	0
+ 577 01c2 0000      		.word	0
+ 578 01c4 5200      		.word	82
+ 579 01c6 0000      		.word	0
+ 580 01c8 0000      		.word	0
+ 581 01ca 0000      		.word	0
+ 582 01cc 0000      		.word	0
+ 583 01ce 0000      		.word	0
+ 584 01d0 0000      		.word	0
+ 585 01d2 0000      		.word	0
+ 586 01d4 0000      		.word	0
+ 587 01d6 0000      		.word	0
+ 588 01d8 0000      		.word	0
+ 589 01da 0000      		.word	0
+ 590 01dc 0000      		.word	0
+ 591 01de 0000      		.word	0
+ 592 01e0 0000      		.word	0
+ 593 01e2 0000      		.word	0
+ 594 01e4 0000      		.word	0
+ 595 01e6 0000      		.word	0
+ 596 01e8 0000      		.word	0
+ 597 01ea 0000      		.word	0
+ 598 01ec 0000      		.word	0
+ 599 01ee 0000      		.word	0
+ 600 01f0 0000      		.word	0
+ 601 01f2 0000      		.word	0
+ 602 01f4 0000      		.word	0
+ 603 01f6 0000      		.word	0
+ 604 01f8 0000      		.word	0
+ 605 01fa 0000      		.word	0
+ 606 01fc 0120      		.word	8193
+ 607 01fe 0220      		.word	8194
+ 608 0200 0320      		.word	8195
+ 609 0202 0420      		.word	8196
+ 610 0204 0520      		.word	8197
+ 611 0206 0620      		.word	8198
+ 612 0208 0720      		.word	8199
+ 613 020a 0820      		.word	8200
+ 614 020c 0920      		.word	8201
+ 615 020e 0000      		.word	0
+ 616 0210 0000      		.word	0
+ 617 0212 0000      		.word	0
+ 618 0214 0000      		.word	0
+ 619 0216 0000      		.word	0
+ 620 0218 0000      		.word	0
+ 621 021a 0000      		.word	0
+ 622 021c 0000      		.word	0
+ 623 021e 0000      		.word	0
+ 624 0220 0000      		.word	0
+ 625 0222 0000      		.word	0
+ 626 0224 0000      		.word	0
+ 627 0226 0000      		.word	0
+ 628 0228 0100      		.word	1
+ 629 022a 0000      		.word	0
+ 630 022c 0000      		.word	0
+ 631 022e 0000      		.word	0
+ 632               		.comm	keymap_config,2,1
+ 633               		.section	.bss.shift_esc_shift_mask.4661,"aw",@nobits
+ 636               	shift_esc_shift_mask.4661:
+ 637 0000 00        		.zero	1
+ 638               		.section	.progmem.data.__m.4692,"a",@progbits
+ 641               	__m.4692:
+ 642 0000 01        		.byte	1
+ 643 0001 1E        		.byte	30
+ 644 0002 02        		.byte	2
+ 645 0003 1E        		.byte	30
+ 646 0004 01        		.byte	1
+ 647 0005 20        		.byte	32
+ 648 0006 02        		.byte	2
+ 649 0007 20        		.byte	32
+ 650 0008 01        		.byte	1
+ 651 0009 23        		.byte	35
+ 652 000a 02        		.byte	2
+ 653 000b 23        		.byte	35
+ 654 000c 01        		.byte	1
+ 655 000d 23        		.byte	35
+ 656 000e 02        		.byte	2
+ 657 000f 23        		.byte	35
+ 658 0010 01        		.byte	1
+ 659 0011 1F        		.byte	31
+ 660 0012 02        		.byte	2
+ 661 0013 1F        		.byte	31
+ 662 0014 01        		.byte	1
+ 663 0015 22        		.byte	34
+ 664 0016 02        		.byte	2
+ 665 0017 22        		.byte	34
+ 666 0018 01        		.byte	1
+ 667 0019 1F        		.byte	31
+ 668 001a 02        		.byte	2
+ 669 001b 1F        		.byte	31
+ 670 001c 01        		.byte	1
+ 671 001d 1E        		.byte	30
+ 672 001e 02        		.byte	2
+ 673 001f 1E        		.byte	30
+ 674 0020 01        		.byte	1
+ 675 0021 21        		.byte	33
+ 676 0022 02        		.byte	2
+ 677 0023 21        		.byte	33
+ 678 0024 01        		.byte	1
+ 679 0025 E1        		.byte	-31
+ 680 0026 01        		.byte	1
+ 681 0027 1F        		.byte	31
+ 682 0028 02        		.byte	2
+ 683 0029 1F        		.byte	31
+ 684 002a 02        		.byte	2
+ 685 002b E1        		.byte	-31
+ 686 002c 01        		.byte	1
+ 687 002d 14        		.byte	20
+ 688 002e 02        		.byte	2
+ 689 002f 14        		.byte	20
+ 690 0030 01        		.byte	1
+ 691 0031 14        		.byte	20
+ 692 0032 02        		.byte	2
+ 693 0033 14        		.byte	20
+ 694 0034 01        		.byte	1
+ 695 0035 37        		.byte	55
+ 696 0036 02        		.byte	2
+ 697 0037 37        		.byte	55
+ 698 0038 01        		.byte	1
+ 699 0039 06        		.byte	6
+ 700 003a 02        		.byte	2
+ 701 003b 06        		.byte	6
+ 702 003c 01        		.byte	1
+ 703 003d 12        		.byte	18
+ 704 003e 02        		.byte	2
+ 705 003f 12        		.byte	18
+ 706 0040 01        		.byte	1
+ 707 0041 10        		.byte	16
+ 708 0042 02        		.byte	2
+ 709 0043 10        		.byte	16
+ 710 0044 00        		.byte	0
+ 711               		.section	.progmem.data.__m.4694,"a",@progbits
+ 714               	__m.4694:
+ 715 0000 00        		.zero	1
+ 716               		.text
+ 717               	.Letext0:
+ 718               		.file 2 "d:\\applications\\keyboard\\avr-gcc-4.7.2-mingw32\\bin\\../lib/gcc/avr/4.7.2/../../../../
+ 719               		.file 3 "../../tmk_core/common/keyboard.h"
+ 720               		.file 4 "../../tmk_core/common/keycode.h"
+ 721               		.file 5 "../../tmk_core/common/action_code.h"
+ 722               		.file 6 "../../tmk_core/common/action_macro.h"
+ 723               		.file 7 "../../tmk_core/common/action.h"
+ 724               		.file 8 "../../quantum/keymap_common.h"
+ 725               		.file 9 "../../tmk_core/protocol/lufa/LUFA-git/LUFA/Drivers/USB/Core/USBTask.h"
+ 726               		.file 10 "./rgblight.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 keymap_tiny.c
+C:\Users\tiny\AppData\Local\Temp\ccr8jkUp.s:2      *ABS*:0000003e __SP_H__
+C:\Users\tiny\AppData\Local\Temp\ccr8jkUp.s:3      *ABS*:0000003d __SP_L__
+C:\Users\tiny\AppData\Local\Temp\ccr8jkUp.s:4      *ABS*:0000003f __SREG__
+C:\Users\tiny\AppData\Local\Temp\ccr8jkUp.s:5      *ABS*:00000000 __tmp_reg__
+C:\Users\tiny\AppData\Local\Temp\ccr8jkUp.s:6      *ABS*:00000001 __zero_reg__
+C:\Users\tiny\AppData\Local\Temp\ccr8jkUp.s:13     .text.action_function:00000000 action_function
+C:\Users\tiny\AppData\Local\Temp\ccr8jkUp.s:636    .bss.shift_esc_shift_mask.4661:00000000 shift_esc_shift_mask.4661
+C:\Users\tiny\AppData\Local\Temp\ccr8jkUp.s:289    .text.action_get_macro:00000000 action_get_macro
+C:\Users\tiny\AppData\Local\Temp\ccr8jkUp.s:641    .progmem.data.__m.4692:00000000 __m.4692
+C:\Users\tiny\AppData\Local\Temp\ccr8jkUp.s:714    .progmem.data.__m.4694:00000000 __m.4694
+C:\Users\tiny\AppData\Local\Temp\ccr8jkUp.s:333    .progmem.data.fn_actions:00000000 fn_actions
+C:\Users\tiny\AppData\Local\Temp\ccr8jkUp.s:351    .progmem.data.keymaps:00000000 keymaps
+                            *COM*:00000002 keymap_config
+
+UNDEFINED SYMBOLS
+get_mods
+add_key
+send_keyboard_report
+del_key
+rgblight_toggle
+rgblight_increase_hue
+rgblight_decrease_hue
+rgblight_increase_sat
+rgblight_decrease_sat
+rgblight_increase_val
+rgblight_decrease_val
+rgblight_step
+rgblight_pre
+__do_clear_bss
